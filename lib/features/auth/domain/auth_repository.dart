@@ -1,3 +1,4 @@
+import 'dart:io';
 import '../../../core/domain/entities/user.dart';
 
 /// Abstract repository interface for authentication operations.
@@ -41,12 +42,37 @@ abstract class AuthRepository {
   /// Update the current user's profile.
   ///
   /// Only provided fields will be updated.
-  Future<User> updateProfile({String? name, String? phone, String? avatarUrl});
+  Future<User> updateProfile({
+    String? name,
+    String? phone,
+    String? avatarUrl,
+    DateTime? createdAt,
+  });
 
-  /// Request a password reset email.
-  ///
-  /// Always succeeds (doesn't reveal if email exists).
+  /// Upload profile image.
+  Future<User> uploadProfileImage(List<int> bytes, String filename);
+
+  /// Request a password reset code.
+  Future<void> requestPasswordReset(String email);
+
+  /// Verify a reset code.
+  Future<void> verifyResetCode(String email, String code);
+
+  /// Complete password reset.
+  Future<void> completePasswordReset({
+    required String email,
+    required String code,
+    required String newPassword,
+  });
+
+  /// Request a password reset email (deprecated).
   Future<void> resetPassword(String email);
+
+  /// Change password.
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  });
 
   /// Check if there's a stored session and restore it.
   ///

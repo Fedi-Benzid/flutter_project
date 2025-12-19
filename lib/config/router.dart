@@ -6,6 +6,9 @@ import '../features/auth/presentation/providers/auth_provider.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/register_screen.dart';
 import '../features/auth/presentation/screens/profile_screen.dart';
+import '../features/auth/presentation/screens/forgot_password_screen.dart';
+import '../features/auth/presentation/screens/verify_code_screen.dart';
+import '../features/auth/presentation/screens/reset_password_screen.dart';
 import '../features/centers/presentation/screens/home_screen.dart';
 import '../features/centers/presentation/screens/center_detail_screen.dart';
 import '../features/centers/presentation/screens/center_form_screen.dart';
@@ -30,6 +33,9 @@ class AppRoutes {
   static const String login = '/login';
   static const String register = '/register';
   static const String profile = '/profile';
+  static const String forgotPassword = '/forgot-password';
+  static const String verifyCode = '/verify-code';
+  static const String resetPassword = '/reset-password';
 
   // Main routes
   static const String home = '/';
@@ -56,8 +62,7 @@ class AppRoutes {
   // Helper methods for dynamic routes
   static String centerDetailPath(String id) => '/centers/$id';
   static String itemDetailPath(String id) => '/items/$id';
-  static String reservationCalendarPath(String centerId) =>
-      '/reserve/$centerId';
+  static String reservationCalendarPath(String centerId) => '/reserve/$centerId';
   static String bookingFlowPath(String centerId) => '/booking/$centerId';
   static String eventDetailPath(String id) => '/events/$id';
 }
@@ -77,9 +82,12 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final isLoggingIn = state.matchedLocation == AppRoutes.login;
       final isRegistering = state.matchedLocation == AppRoutes.register;
+      final isForgotPassword = state.matchedLocation == AppRoutes.forgotPassword;
+      final isVerifyingCode = state.matchedLocation == AppRoutes.verifyCode;
+      final isResettingPassword = state.matchedLocation == AppRoutes.resetPassword;
 
       // If not logged in and not on auth pages, redirect to login
-      if (!isLoggedIn && !isLoggingIn && !isRegistering) {
+      if (!isLoggedIn && !isLoggingIn && !isRegistering && !isForgotPassword && !isVerifyingCode && !isResettingPassword) {
         return AppRoutes.login;
       }
 
@@ -101,6 +109,30 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.register,
         name: 'register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.forgotPassword,
+        name: 'forgotPassword',
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.verifyCode,
+        name: 'verifyCode',
+        builder: (context, state) {
+          final email = state.extra as String? ?? '';
+          return VerifyCodeScreen(email: email);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.resetPassword,
+        name: 'resetPassword',
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>? ?? {};
+          return ResetPasswordScreen(
+            email: data['email'] as String? ?? '',
+            code: data['code'] as String? ?? '',
+          );
+        },
       ),
 
       // Main app with shell (bottom navigation)

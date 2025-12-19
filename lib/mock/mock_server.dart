@@ -89,8 +89,7 @@ class MockServer {
 
     // Generate mock token
     _currentUserId = user.id;
-    _currentAuthToken =
-        'mock_token_${user.id}_${DateTime.now().millisecondsSinceEpoch}';
+    _currentAuthToken = 'mock_token_${user.id}_${DateTime.now().millisecondsSinceEpoch}';
 
     return {'user': user.toJson(), 'token': _currentAuthToken};
   }
@@ -121,8 +120,7 @@ class MockServer {
 
     _users[user.id] = user;
     _currentUserId = user.id;
-    _currentAuthToken =
-        'mock_token_${user.id}_${DateTime.now().millisecondsSinceEpoch}';
+    _currentAuthToken = 'mock_token_${user.id}_${DateTime.now().millisecondsSinceEpoch}';
 
     return {'user': user.toJson(), 'token': _currentAuthToken};
   }
@@ -146,6 +144,7 @@ class MockServer {
     String? name,
     String? phone,
     String? avatarUrl,
+    DateTime? createdAt,
   }) async {
     await _simulateDelay();
     _checkAuth();
@@ -155,6 +154,7 @@ class MockServer {
       name: name ?? current.name,
       phone: phone ?? current.phone,
       avatarUrl: avatarUrl ?? current.avatarUrl,
+      createdAt: createdAt ?? current.createdAt,
     );
 
     _users[_currentUserId!] = updated;
@@ -188,18 +188,13 @@ class MockServer {
       final query = search.toLowerCase();
       results = results
           .where(
-            (c) =>
-                c.name.toLowerCase().contains(query) ||
-                c.location.toLowerCase().contains(query) ||
-                c.description.toLowerCase().contains(query),
+            (c) => c.name.toLowerCase().contains(query) || c.location.toLowerCase().contains(query) || c.description.toLowerCase().contains(query),
           )
           .toList();
     }
 
     if (tags != null && tags.isNotEmpty) {
-      results = results
-          .where((c) => tags.any((tag) => c.tags.contains(tag)))
-          .toList();
+      results = results.where((c) => tags.any((tag) => c.tags.contains(tag))).toList();
     }
 
     if (isInteresting == true) {
@@ -425,19 +420,12 @@ class MockServer {
 
     if (ownerView == true) {
       // Get reservations for centers owned by current user
-      final ownedCenterIds = _centers.values
-          .where((c) => c.ownerId == _currentUserId)
-          .map((c) => c.id)
-          .toSet();
-      return _reservations.values
-          .where((r) => ownedCenterIds.contains(r.centerId))
-          .toList();
+      final ownedCenterIds = _centers.values.where((c) => c.ownerId == _currentUserId).map((c) => c.id).toSet();
+      return _reservations.values.where((r) => ownedCenterIds.contains(r.centerId)).toList();
     }
 
     // Get user's own reservations
-    return _reservations.values
-        .where((r) => r.userId == _currentUserId)
-        .toList();
+    return _reservations.values.where((r) => r.userId == _currentUserId).toList();
   }
 
   /// GET /reservations/:id
@@ -759,17 +747,14 @@ class MockServer {
   }
 
   void _updateCenterRating(String centerId) {
-    final centerReviews =
-        _reviews.values.where((r) => r.centerId == centerId).toList();
+    final centerReviews = _reviews.values.where((r) => r.centerId == centerId).toList();
     if (centerReviews.isEmpty) {
       _centers[centerId] = _centers[centerId]!.copyWith(
         averageRating: 0,
         reviewCount: 0,
       );
     } else {
-      final avgRating =
-          centerReviews.map((r) => r.rating).reduce((a, b) => a + b) /
-              centerReviews.length;
+      final avgRating = centerReviews.map((r) => r.rating).reduce((a, b) => a + b) / centerReviews.length;
       _centers[centerId] = _centers[centerId]!.copyWith(
         averageRating: avgRating,
         reviewCount: centerReviews.length,
@@ -820,9 +805,7 @@ class MockServer {
           itemId: cartItem.item.id,
           name: cartItem.item.name,
           quantity: cartItem.quantity,
-          unitPrice: cartItem.isRenting
-              ? cartItem.item.rentPricePerDay
-              : (cartItem.item.buyPrice ?? 0),
+          unitPrice: cartItem.isRenting ? cartItem.item.rentPricePerDay : (cartItem.item.buyPrice ?? 0),
           totalPrice: totalPrice,
           isRental: cartItem.isRenting,
           rentalDays: cartItem.isRenting ? cartItem.rentalDays : null,

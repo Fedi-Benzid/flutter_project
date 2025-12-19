@@ -19,16 +19,12 @@ final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
 
 /// Provider that returns the current user if authenticated.
 final currentUserProvider = Provider<User?>((ref) {
-  return ref
-      .watch(authStateProvider)
-      .maybeWhen(authenticated: (user) => user, orElse: () => null);
+  return ref.watch(authStateProvider).maybeWhen(authenticated: (user) => user, orElse: () => null);
 });
 
 /// Provider that returns whether the user is authenticated.
 final isAuthenticatedProvider = Provider<bool>((ref) {
-  return ref
-      .watch(authStateProvider)
-      .maybeWhen(authenticated: (_) => true, orElse: () => false);
+  return ref.watch(authStateProvider).maybeWhen(authenticated: (_) => true, orElse: () => false);
 });
 
 /// Provider that returns whether the current user is a center owner.
@@ -119,6 +115,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     String? name,
     String? phone,
     String? avatarUrl,
+    DateTime? createdAt,
   }) async {
     // Don't change auth state while updating profile
     try {
@@ -126,6 +123,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         name: name,
         phone: phone,
         avatarUrl: avatarUrl,
+        createdAt: createdAt,
       );
       state = AuthState.authenticated(updatedUser);
       return true;
@@ -136,9 +134,73 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  /// Request a password reset.
+  /// Upload the current user's profile image.
+  Future<void> uploadProfileImage(List<int> bytes, String filename) async {
+    try {
+      final updatedUser = await _repository.uploadProfileImage(bytes, filename);
+      state = AuthState.authenticated(updatedUser);
+    } catch (e) {
+      // Don't change state to error, just rethrow
+      rethrow;
+    }
+  }
+
+  /// Request a password reset code.
+  Future<bool> requestPasswordReset(String email) async {
+    try {
+      await _repository.requestPasswordReset(email);
+      return true;
+    } catch (e) {
+      state = AuthState.error(e.toString());
+      return false;
+    }
+  }
+
+  /// Verify a reset code.
+  Future<bool> verifyResetCode(String email, String code) async {
+    try {
+      await _repository.verifyResetCode(email, code);
+      return true;
+    } catch (e) {
+      state = AuthState.error(e.toString());
+      return false;
+    }
+  }
+
+  /// Complete password reset.
+  Future<bool> completePasswordReset({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    try {
+      await _repository.completePasswordReset(
+        email: email,
+        code: code,
+        newPassword: newPassword,
+      );
+      return true;
+    } catch (e) {
+      state = AuthState.error(e.toString());
+      return false;
+    }
+  }
+
+  /// Change password.
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    // We don't change global state to error here to avoid disrupting the session
+    await _repository.changePassword(
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+    );
+  }
+
+  /// Request a password reset (deprecated).
   Future<void> resetPassword(String email) async {
-    await _repository.resetPassword(email);
+    await requestPasswordReset(email);
   }
 
   /// Clear any error state.

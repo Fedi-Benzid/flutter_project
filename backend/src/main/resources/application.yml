@@ -27,6 +27,18 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: seifrh.contact@gmail.com
+    password: pmcucbxtylauoqib
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 server:
   port: 8080
 

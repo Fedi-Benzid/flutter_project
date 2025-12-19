@@ -1,5 +1,6 @@
 import '../../../core/domain/entities/user.dart';
 import '../../../core/storage/secure_storage_service.dart';
+import 'package:dio/dio.dart';
 import 'auth_api_service.dart';
 import '../domain/auth_repository.dart';
 
@@ -83,12 +84,14 @@ class ApiAuthRepository implements AuthRepository {
     String? name,
     String? phone,
     String? avatarUrl,
+    DateTime? createdAt,
   }) async {
     try {
       final userData = await _apiService.updateProfile(
         name: name,
         phone: phone,
         avatarUrl: avatarUrl,
+        createdAt: createdAt,
       );
       return User.fromJson(userData);
     } catch (e) {
@@ -97,8 +100,68 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<User> uploadProfileImage(List<int> bytes, String filename) async {
+    try {
+      final userData = await _apiService.uploadProfileImage(bytes, filename);
+      return User.fromJson(userData);
+    } catch (e) {
+      throw AuthException(e.toString());
+    }
+  }
+
+  @override
+  Future<void> requestPasswordReset(String email) async {
+    try {
+      await _apiService.requestPasswordReset(email);
+    } catch (e) {
+      throw AuthException(e.toString());
+    }
+  }
+
+  @override
+  Future<void> verifyResetCode(String email, String code) async {
+    try {
+      await _apiService.verifyResetCode(email, code);
+    } catch (e) {
+      throw AuthException(e.toString());
+    }
+  }
+
+  @override
+  Future<void> completePasswordReset({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    try {
+      await _apiService.completePasswordReset(
+        email: email,
+        code: code,
+        newPassword: newPassword,
+      );
+    } catch (e) {
+      throw AuthException(e.toString());
+    }
+  }
+
+  @override
   Future<void> resetPassword(String email) async {
-    await _apiService.resetPassword(email);
+    await requestPasswordReset(email);
+  }
+
+  @override
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      await _apiService.changePassword(
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      );
+    } catch (e) {
+      throw AuthException(e.toString());
+    }
   }
 
   @override

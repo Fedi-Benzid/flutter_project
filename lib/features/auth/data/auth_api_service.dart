@@ -54,8 +54,7 @@ class AuthApiService {
       // Split name into firstName and lastName
       final nameParts = name.trim().split(' ');
       final firstName = nameParts.first;
-      final lastName =
-          nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+      final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
 
       final response = await _dio.post(
         '${AppConfig.authPath}/register',
@@ -105,12 +104,14 @@ class AuthApiService {
     String? name,
     String? phone,
     String? avatarUrl,
+    DateTime? createdAt,
   }) async {
     try {
       final data = <String, dynamic>{};
       if (name != null) data['name'] = name;
       if (phone != null) data['phoneNumber'] = phone;
       if (avatarUrl != null) data['avatarUrl'] = avatarUrl;
+      if (createdAt != null) data['createdAt'] = createdAt.toIso8601String();
 
       final response = await _dio.put(
         '${AppConfig.authPath}/profile',
@@ -132,18 +133,126 @@ class AuthApiService {
     }
   }
 
-  /// Request password reset
-  Future<void> resetPassword(String email) async {
+  /// Upload profile image
+  Future<Map<String, dynamic>> uploadProfileImage(List<int> bytes, String filename) async {
+    try {
+      final formData = FormData.fromMap({
+        'image': MultipartFile.fromBytes(
+          bytes,
+          filename: filename,
+        ),
+      });
+
+      final response = await _dio.post(
+        '${AppConfig.authPath}/profile/image',
+        data: formData,
+      );
+
+      final apiResponse = response.data as Map<String, dynamic>;
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return _transformUserData(apiResponse['data']);
+      }
+
+      throw ApiException(apiResponse['message'] ?? 'Failed to upload image');
+    } on DioException catch (e) {
+      if (e.error is ApiException) {
+        rethrow;
+      }
+      throw ApiException('Failed to upload image: ${e.message}');
+    }
+  }
+
+  /// Request password reset code
+  Future<void> requestPasswordReset(String email) async {
     try {
       await _dio.post(
-        '${AppConfig.authPath}/reset-password',
+        '${AppConfig.authPath}/reset-password-request',
         data: {'email': email},
       );
     } on DioException catch (e) {
       if (e.error is ApiException) {
         rethrow;
       }
+      throw ApiException('Failed to request reset code: ${e.message}');
+    }
+  }
+
+  /// Verify reset code
+  Future<void> verifyResetCode(String email, String code) async {
+    try {
+      final response = await _dio.post(
+        '${AppConfig.authPath}/verify-reset-code',
+        data: {
+          'email': email,
+          'code': code,
+        },
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+      if (apiResponse['success'] != true) {
+        throw ApiException(apiResponse['message'] ?? 'Invalid code');
+      }
+    } on DioException catch (e) {
+      if (e.error is ApiException) {
+        rethrow;
+      }
+      throw ApiException('Failed to verify code: ${e.message}');
+    }
+  }
+
+  /// Complete password reset
+  Future<void> completePasswordReset({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '${AppConfig.authPath}/reset-password',
+        data: {
+          'email': email,
+          'code': code,
+          'newPassword': newPassword,
+        },
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+      if (apiResponse['success'] != true) {
+        throw ApiException(apiResponse['message'] ?? 'Failed to reset password');
+      }
+    } on DioException catch (e) {
+      if (e.error is ApiException) {
+        rethrow;
+      }
       throw ApiException('Failed to reset password: ${e.message}');
+    }
+  }
+
+  /// Request password reset (deprecated - keeping for compatibility if needed)
+  Future<void> resetPassword(String email) async {
+    await requestPasswordReset(email);
+  }
+
+  /// Change password for authenticated user
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '${AppConfig.authPath}/change-password',
+        data: {
+          'oldPassword': oldPassword,
+          'newPassword': newPassword,
+        },
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+      if (apiResponse['success'] != true) {
+        throw ApiException(apiResponse['message'] ?? 'Failed to change password');
+      }
+    } on DioException catch (e) {
+      if (e.error is ApiException) {
+        rethrow;
+      }
+      throw ApiException('Failed to change password: ${e.message}');
     }
   }
 
@@ -155,8 +264,7 @@ class AuthApiService {
     final id = backendUser['id'];
     final firstName = backendUser['firstName'] as String? ?? '';
     final lastName = backendUser['lastName'] as String? ?? '';
-    final name =
-        backendUser['name'] as String? ?? '$firstName $lastName'.trim();
+    final name = backendUser['name'] as String? ?? '$firstName $lastName'.trim();
     final role = backendUser['role'] as String?;
 
     // Map backend role to Flutter role
