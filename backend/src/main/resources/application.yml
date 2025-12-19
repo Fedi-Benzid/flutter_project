@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: campify-backend
+
+  datasource:
+    url: jdbc:postgresql://ep-silent-mode-a8hbziq5-pooler.eastus2.azure.neon.tech/campify
+    username: neondb_owner
+    password: npg_rZI2zS9jtRkn   # ⚠️ replace with env variable in prod
+    driver-class-name: org.postgresql.Driver
+
+    hikari:
+      data-source-properties:
+        sslmode: require
+        channelBinding: require
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: 8080
+
+# JWT Configuration
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  expiration: 86400000 # 1 day
+
+# File Storage
+file:
+  upload-dir: uploads
