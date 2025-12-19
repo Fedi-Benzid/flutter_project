@@ -54,26 +54,18 @@ class MyReservationsScreen extends ConsumerWidget {
           // Group reservations by status
           final upcoming = reservations
               .where(
-                (r) =>
-                    r.status == ReservationStatus.approved &&
-                    r.startDate.isAfter(DateTime.now()),
+                (r) => r.status == ReservationStatus.approved && r.startDate.isAfter(DateTime.now()),
               )
               .toList();
-          final pending = reservations
-              .where((r) => r.status == ReservationStatus.pending)
-              .toList();
+          final pending = reservations.where((r) => r.status == ReservationStatus.pending).toList();
           final past = reservations
               .where(
-                (r) =>
-                    r.status == ReservationStatus.completed ||
-                    r.endDate.isBefore(DateTime.now()),
+                (r) => r.status == ReservationStatus.completed || r.endDate.isBefore(DateTime.now()),
               )
               .toList();
           final cancelled = reservations
               .where(
-                (r) =>
-                    r.status == ReservationStatus.cancelled ||
-                    r.status == ReservationStatus.declined,
+                (r) => r.status == ReservationStatus.cancelled || r.status == ReservationStatus.declined,
               )
               .toList();
 
@@ -167,7 +159,8 @@ class _ReservationCard extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Reservation #${reservation.id.substring(reservation.id.length - 6)}',
+                          //'Reservation #${reservation.id.substring(reservation.id.length - 6)}',
+                          'Reservation #${reservation.id}',
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -247,9 +240,7 @@ class _ReservationCard extends ConsumerWidget {
                       );
 
                       if (confirm == true) {
-                        await ref
-                            .read(reservationsNotifierProvider.notifier)
-                            .cancelReservation(reservation.id);
+                        await ref.read(reservationsNotifierProvider.notifier).cancelReservation(reservation.id);
                       }
                     },
                     style: OutlinedButton.styleFrom(

@@ -26,7 +26,7 @@ public class AuthDtos {
     public static class RegisterRequest {
         @NotBlank
         private String firstName;
-        @NotBlank
+
         private String lastName;
         @NotBlank
         @Email
