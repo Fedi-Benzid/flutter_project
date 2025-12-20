@@ -98,9 +98,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   CircleAvatar(
                     radius: 60,
                     backgroundColor: theme.colorScheme.primaryContainer,
-                    backgroundImage: user.avatarUrl != null
-                        ? NetworkImage(user.avatarUrl!)
-                        : null,
+                    backgroundImage: user.avatarUrl != null ? NetworkImage(user.avatarUrl!) : null,
                     child: user.avatarUrl == null
                         ? Text(
                             user.name.substring(0, 1).toUpperCase(),
@@ -153,17 +151,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: user.role == UserRole.owner
-                      ? theme.colorScheme.secondaryContainer
-                      : theme.colorScheme.tertiaryContainer,
+                  color: user.role == UserRole.owner ? theme.colorScheme.secondaryContainer : theme.colorScheme.tertiaryContainer,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   user.role == UserRole.owner ? 'Center Owner' : 'Camper',
                   style: theme.textTheme.labelMedium?.copyWith(
-                    color: user.role == UserRole.owner
-                        ? theme.colorScheme.onSecondaryContainer
-                        : theme.colorScheme.onTertiaryContainer,
+                    color: user.role == UserRole.owner ? theme.colorScheme.onSecondaryContainer : theme.colorScheme.onTertiaryContainer,
                   ),
                 ),
               ),
@@ -201,12 +195,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 title: 'Phone',
                 value: user.phone ?? 'Not set',
               ),
-              _ProfileCard(
+              _ProfileInfoItem(
                 icon: Icons.calendar_today_outlined,
-                title: 'Member since',
-                value: user.createdAt != null
-                    ? '${user.createdAt!.day}/${user.createdAt!.month}/${user.createdAt!.year}'
-                    : 'Unknown',
+                label: 'Member Since',
+                value: user?.createdAt != null ? _formatDate(user!.createdAt!) : 'N/A',
+                onTap: () => _showDatePicker(context, user),
               ),
 
               const SizedBox(height: 32),
@@ -233,13 +226,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 const Divider(),
               ],
 
-              // Logout button
+              // Change Password button
               const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: _showChangePasswordDialog,
+                icon: const Icon(Icons.lock_outline),
+                label: const Text('Change Password'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+              ),
+
+              // Logout button
+              const SizedBox(height: 12),
               OutlinedButton.icon(
                 onPressed: _handleLogout,
                 icon: const Icon(Icons.logout),
                 label: const Text('Logout'),
                 style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
                   foregroundColor: theme.colorScheme.error,
                   side: BorderSide(color: theme.colorScheme.error),
                 ),
@@ -251,6 +256,157 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  Future<void> _showDatePicker(BuildContext context, User? user) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: user?.createdAt ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != user?.createdAt) {
+      try {
+        await ref.read(authStateProvider.notifier).updateProfile(
+              createdAt: picked,
+            );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Profile updated successfully')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to update profile: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  Future<void> _showChangePasswordDialog() async {
+    final oldPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+    bool isLoading = false;
+    bool obscureOld = true;
+    bool obscureNew = true;
+    bool obscureConfirm = true;
+
+    await showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Change Password'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: oldPasswordController,
+                obscureText: obscureOld,
+                decoration: InputDecoration(
+                  labelText: 'Current Password',
+                  suffixIcon: IconButton(
+                    icon: Icon(obscureOld ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () => setDialogState(() => obscureOld = !obscureOld),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: newPasswordController,
+                obscureText: obscureNew,
+                decoration: InputDecoration(
+                  labelText: 'New Password',
+                  suffixIcon: IconButton(
+                    icon: Icon(obscureNew ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () => setDialogState(() => obscureNew = !obscureNew),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: confirmPasswordController,
+                obscureText: obscureConfirm,
+                decoration: InputDecoration(
+                  labelText: 'Confirm New Password',
+                  suffixIcon: IconButton(
+                    icon: Icon(obscureConfirm ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () => setDialogState(() => obscureConfirm = !obscureConfirm),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: isLoading ? null : () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      if (newPasswordController.text != confirmPasswordController.text) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('New passwords do not match')),
+                        );
+                        return;
+                      }
+
+                      if (newPasswordController.text.length < 6) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Password must be at least 6 characters')),
+                        );
+                        return;
+                      }
+
+                      setDialogState(() => isLoading = true);
+                      try {
+                        await ref.read(authStateProvider.notifier).changePassword(
+                              oldPassword: oldPasswordController.text,
+                              newPassword: newPasswordController.text,
+                            );
+
+                        if (mounted) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Password changed successfully')),
+                          );
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          setDialogState(() => isLoading = false);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(e.toString().replaceAll('AuthException: ', '')),
+                              backgroundColor: Theme.of(context).colorScheme.error,
+                            ),
+                          );
+                        }
+                      }
+                    },
+              child: isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Text('Change'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    oldPasswordController.dispose();
+    newPasswordController.dispose();
+    confirmPasswordController.dispose();
+  }
+
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final image = await picker.pickImage(
@@ -260,21 +416,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
 
     if (image != null) {
-      // In demo mode, we'll just use a placeholder URL
-      // In production, you'd upload the image to a server
-      final mockUrl =
-          'https://i.pravatar.cc/150?u=${DateTime.now().millisecondsSinceEpoch}';
-
       setState(() => _isSaving = true);
-      final success = await ref
-          .read(authStateProvider.notifier)
-          .updateProfile(avatarUrl: mockUrl);
-      setState(() => _isSaving = false);
-
-      if (mounted && success) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Profile photo updated')));
+      try {
+        final bytes = await image.readAsBytes();
+        await ref.read(authStateProvider.notifier).uploadProfileImage(
+              bytes,
+              image.name,
+            );
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Profile photo updated')));
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to update profile photo: $e')));
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isSaving = false);
+        }
       }
     }
   }
@@ -282,13 +445,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Future<void> _saveProfile() async {
     setState(() => _isSaving = true);
 
-    final success = await ref
-        .read(authStateProvider.notifier)
-        .updateProfile(
+    final success = await ref.read(authStateProvider.notifier).updateProfile(
           name: _nameController.text.trim(),
-          phone: _phoneController.text.trim().isEmpty
-              ? null
-              : _phoneController.text.trim(),
+          phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
         );
 
     setState(() {
@@ -336,6 +495,64 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (confirm == true) {
       await ref.read(authStateProvider.notifier).logout();
     }
+  }
+}
+
+class _ProfileInfoItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final VoidCallback? onTap;
+
+  const _ProfileInfoItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.grey[600], size: 24),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (onTap != null)
+              Icon(
+                Icons.edit_outlined,
+                color: Colors.grey[400],
+                size: 20,
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

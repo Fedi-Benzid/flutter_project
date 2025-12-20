@@ -18,7 +18,6 @@ class ApiClient {
       connectTimeout: AppConfig.connectTimeout,
       receiveTimeout: AppConfig.receiveTimeout,
       headers: {
-        'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
     ));
@@ -73,23 +72,20 @@ class ApiClient {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return NetworkException(
-            'Connection timeout. Please check your internet connection.');
+        return NetworkException('Connection timeout. Please check your internet connection.');
 
       case DioExceptionType.badResponse:
         final statusCode = error.response?.statusCode;
         final message = _extractErrorMessage(error.response?.data);
 
         if (statusCode == 401) {
-          return AuthenticationException(message ?? 'Unauthorized',
-              statusCode: statusCode);
+          return AuthenticationException(message ?? 'Unauthorized', statusCode: statusCode);
         } else if (statusCode == 403) {
           return AuthorizationException(message ?? 'Forbidden');
         } else if (statusCode == 404) {
           return NotFoundException(message ?? 'Resource not found');
         } else if (statusCode == 400) {
-          return ValidationException(message ?? 'Validation error',
-              data: error.response?.data);
+          return ValidationException(message ?? 'Validation error', data: error.response?.data);
         }
 
         return ApiException(

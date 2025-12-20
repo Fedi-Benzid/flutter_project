@@ -97,12 +97,14 @@ class MockAuthRepository implements AuthRepository {
     String? name,
     String? phone,
     String? avatarUrl,
+    DateTime? createdAt,
   }) async {
     try {
       return await _mockServer.updateProfile(
         name: name,
         phone: phone,
         avatarUrl: avatarUrl,
+        createdAt: createdAt,
       );
     } on MockServerException catch (e) {
       throw AuthException(e.message);
@@ -110,8 +112,45 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<User> uploadProfileImage(List<int> bytes, String filename) async {
+    // Generate a placeholder URL for mock
+    final mockUrl = 'https://i.pravatar.cc/150?u=${DateTime.now().millisecondsSinceEpoch}';
+    return await updateProfile(avatarUrl: mockUrl);
+  }
+
+  @override
+  Future<void> requestPasswordReset(String email) async {
+    await _mockServer.resetPassword(email);
+  }
+
+  @override
+  Future<void> verifyResetCode(String email, String code) async {
+    // Simply succeed for mock
+    return;
+  }
+
+  @override
+  Future<void> completePasswordReset({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    // Simply succeed for mock
+    return;
+  }
+
+  @override
   Future<void> resetPassword(String email) async {
     await _mockServer.resetPassword(email);
+  }
+
+  @override
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    // Simply succeed for mock
+    return;
   }
 
   @override

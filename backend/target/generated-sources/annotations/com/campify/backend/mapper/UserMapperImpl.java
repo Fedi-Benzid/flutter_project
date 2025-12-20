@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-12-17T21:58:54+0100",
+    date = "2025-12-19T20:18:46+0100",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251118-1623, environment: Java 21.0.9 (Eclipse Adoptium)"
 )
 @Component
@@ -21,13 +21,14 @@ public class UserMapperImpl implements UserMapper {
 
         AuthDtos.UserDto userDto = new AuthDtos.UserDto();
 
-        userDto.setAvatarUrl( user.getAvatarUrl() );
+        userDto.setId( user.getId() );
         userDto.setEmail( user.getEmail() );
         userDto.setFirstName( user.getFirstName() );
-        userDto.setId( user.getId() );
         userDto.setLastName( user.getLastName() );
-        userDto.setPhoneNumber( user.getPhoneNumber() );
+        userDto.setAvatarUrl( user.getAvatarUrl() );
         userDto.setRole( user.getRole() );
+        userDto.setPhoneNumber( user.getPhoneNumber() );
+        userDto.setCreatedAt( user.getCreatedAt() );
 
         return userDto;
     }
@@ -40,13 +41,14 @@ public class UserMapperImpl implements UserMapper {
 
         User.UserBuilder user = User.builder();
 
-        user.avatarUrl( userDto.getAvatarUrl() );
+        user.id( userDto.getId() );
         user.email( userDto.getEmail() );
         user.firstName( userDto.getFirstName() );
-        user.id( userDto.getId() );
         user.lastName( userDto.getLastName() );
         user.phoneNumber( userDto.getPhoneNumber() );
+        user.avatarUrl( userDto.getAvatarUrl() );
         user.role( userDto.getRole() );
+        user.createdAt( userDto.getCreatedAt() );
 
         return user.build();
     }

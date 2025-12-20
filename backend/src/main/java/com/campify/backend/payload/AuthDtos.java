@@ -26,7 +26,7 @@ public class AuthDtos {
     public static class RegisterRequest {
         @NotBlank
         private String firstName;
-        @NotBlank
+
         private String lastName;
         @NotBlank
         @Email
@@ -61,6 +61,7 @@ public class AuthDtos {
         private String avatarUrl;
         private User.Role role;
         private String phoneNumber;
+        private java.time.LocalDateTime createdAt;
 
         // Computed field for Flutter compatibility (combines firstName + lastName)
         public String getName() {
@@ -83,6 +84,7 @@ public class AuthDtos {
         private String lastName;
         private String phoneNumber;
         private String avatarUrl;
+        private java.time.LocalDateTime createdAt;
     }
 
     @Data
@@ -92,5 +94,37 @@ public class AuthDtos {
         @NotBlank
         @Email
         private String email;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class VerifyCodeRequest {
+        @NotBlank
+        @Email
+        private String email;
+        @NotBlank
+        private String code;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CompletePasswordResetRequest {
+        @NotBlank
+        @Email
+        private String email;
+        @NotBlank
+        private String code;
+        @NotBlank
+        private String newPassword;
+    }
+
+    @Data
+    public static class ChangePasswordRequest {
+        @NotBlank
+        private String oldPassword;
+        @NotBlank
+        private String newPassword;
     }
 }
