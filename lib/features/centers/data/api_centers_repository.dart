@@ -39,17 +39,31 @@ class ApiCentersRepository implements CentersRepository {
 
   @override
   Future<CampingCenter> createCenter(CampingCenter center) async {
-    throw UnimplementedError('Create center not yet implemented');
+    final centerData = _centerToJson(center);
+    final data = await _apiService.createCenter(centerData);
+    return _transformCenter(data);
   }
 
   @override
   Future<CampingCenter> updateCenter(String id, CampingCenter center) async {
-    throw UnimplementedError('Update center not yet implemented');
+    final centerData = _centerToJson(center);
+    final data = await _apiService.updateCenter(id, centerData);
+    return _transformCenter(data);
   }
 
   @override
   Future<void> deleteCenter(String id) async {
-    throw UnimplementedError('Delete center not yet implemented');
+    await _apiService.deleteCenter(id);
+  }
+
+  Map<String, dynamic> _centerToJson(CampingCenter center) {
+    return {
+      'name': center.name,
+      'description': center.description,
+      'location': center.location,
+      'price': '${center.priceMin.toStringAsFixed(0)} TND/night',
+      'images': center.photos,
+    };
   }
 
   @override

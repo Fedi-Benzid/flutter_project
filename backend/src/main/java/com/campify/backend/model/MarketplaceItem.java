@@ -39,6 +39,8 @@ public class MarketplaceItem {
 
     private Long centerId; // Optional: link to a specific center
 
+    private Long ownerId; // Owner of the product (for CRUD permissions)
+
     @ElementCollection
     @CollectionTable(name = "marketplace_item_images", joinColumns = @JoinColumn(name = "item_id"))
     @Column(name = "image_url")

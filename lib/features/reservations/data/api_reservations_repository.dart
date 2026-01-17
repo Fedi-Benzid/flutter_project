@@ -40,7 +40,24 @@ class ApiReservationsRepository implements ReservationsRepository {
 
   @override
   Future<Reservation> updateStatus(String id, ReservationStatus status) async {
-    throw UnimplementedError('Update status not yet implemented');
+    final statusStr = _statusToBackend(status);
+    final data = await _apiService.updateStatus(id, statusStr);
+    return _transformReservation(data);
+  }
+
+  String _statusToBackend(ReservationStatus status) {
+    switch (status) {
+      case ReservationStatus.approved:
+        return 'CONFIRMED';
+      case ReservationStatus.declined:
+        return 'CANCELLED';
+      case ReservationStatus.cancelled:
+        return 'CANCELLED';
+      case ReservationStatus.completed:
+        return 'COMPLETED';
+      case ReservationStatus.pending:
+        return 'PENDING';
+    }
   }
 
   @override

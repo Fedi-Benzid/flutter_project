@@ -64,6 +64,24 @@ public class CampingCenterController {
                 HttpStatus.CREATED);
     }
 
+    // JSON-based create for simpler clients
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse<CampingCenter>> createCenterJson(@Valid @RequestBody CampingCenter center) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        CampingCenter createdCenter = campingCenterService.createCenter(center, null, auth.getName());
+        return new ResponseEntity<>(new ApiResponse<>(true, "Center created successfully", createdCenter),
+                HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<CampingCenter>> updateCenter(
+            @PathVariable Long id,
+            @Valid @RequestBody CampingCenter center) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        CampingCenter updatedCenter = campingCenterService.updateCenter(id, center, auth.getName());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Center updated successfully", updatedCenter));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteCenter(@PathVariable Long id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

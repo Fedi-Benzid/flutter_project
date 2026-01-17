@@ -32,8 +32,11 @@ mixin _$Event {
   /// Detailed description of the event
   String get description => throw _privateConstructorUsedError;
 
-  /// Date and time of the event
+  /// Date and time of the event start
   DateTime get date => throw _privateConstructorUsedError;
+
+  /// End date and time of the event
+  DateTime? get endDate => throw _privateConstructorUsedError;
 
   /// Duration in hours
   int get durationHours => throw _privateConstructorUsedError;
@@ -46,6 +49,21 @@ mixin _$Event {
 
   /// Optional image URL for the event
   String? get imageUrl => throw _privateConstructorUsedError;
+
+  /// Location of the event
+  String? get location => throw _privateConstructorUsedError;
+
+  /// Price per person
+  double get price => throw _privateConstructorUsedError;
+
+  /// Activities included in the event
+  List<String> get activities => throw _privateConstructorUsedError;
+
+  /// ID of the event creator
+  String? get creatorId => throw _privateConstructorUsedError;
+
+  /// Phone number of the event creator
+  String? get creatorPhone => throw _privateConstructorUsedError;
 
   /// When the event was created
   DateTime? get createdAt => throw _privateConstructorUsedError;
@@ -66,10 +84,16 @@ abstract class $EventCopyWith<$Res> {
       String title,
       String description,
       DateTime date,
+      DateTime? endDate,
       int durationHours,
       int maxParticipants,
       int currentParticipants,
       String? imageUrl,
+      String? location,
+      double price,
+      List<String> activities,
+      String? creatorId,
+      String? creatorPhone,
       DateTime? createdAt});
 }
 
@@ -91,10 +115,16 @@ class _$EventCopyWithImpl<$Res, $Val extends Event>
     Object? title = null,
     Object? description = null,
     Object? date = null,
+    Object? endDate = freezed,
     Object? durationHours = null,
     Object? maxParticipants = null,
     Object? currentParticipants = null,
     Object? imageUrl = freezed,
+    Object? location = freezed,
+    Object? price = null,
+    Object? activities = null,
+    Object? creatorId = freezed,
+    Object? creatorPhone = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(_value.copyWith(
@@ -118,6 +148,10 @@ class _$EventCopyWithImpl<$Res, $Val extends Event>
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      endDate: freezed == endDate
+          ? _value.endDate
+          : endDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       durationHours: null == durationHours
           ? _value.durationHours
           : durationHours // ignore: cast_nullable_to_non_nullable
@@ -133,6 +167,26 @@ class _$EventCopyWithImpl<$Res, $Val extends Event>
       imageUrl: freezed == imageUrl
           ? _value.imageUrl
           : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      location: freezed == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as String?,
+      price: null == price
+          ? _value.price
+          : price // ignore: cast_nullable_to_non_nullable
+              as double,
+      activities: null == activities
+          ? _value.activities
+          : activities // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      creatorId: freezed == creatorId
+          ? _value.creatorId
+          : creatorId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      creatorPhone: freezed == creatorPhone
+          ? _value.creatorPhone
+          : creatorPhone // ignore: cast_nullable_to_non_nullable
               as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
@@ -155,10 +209,16 @@ abstract class _$$EventImplCopyWith<$Res> implements $EventCopyWith<$Res> {
       String title,
       String description,
       DateTime date,
+      DateTime? endDate,
       int durationHours,
       int maxParticipants,
       int currentParticipants,
       String? imageUrl,
+      String? location,
+      double price,
+      List<String> activities,
+      String? creatorId,
+      String? creatorPhone,
       DateTime? createdAt});
 }
 
@@ -178,10 +238,16 @@ class __$$EventImplCopyWithImpl<$Res>
     Object? title = null,
     Object? description = null,
     Object? date = null,
+    Object? endDate = freezed,
     Object? durationHours = null,
     Object? maxParticipants = null,
     Object? currentParticipants = null,
     Object? imageUrl = freezed,
+    Object? location = freezed,
+    Object? price = null,
+    Object? activities = null,
+    Object? creatorId = freezed,
+    Object? creatorPhone = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(_$EventImpl(
@@ -205,6 +271,10 @@ class __$$EventImplCopyWithImpl<$Res>
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      endDate: freezed == endDate
+          ? _value.endDate
+          : endDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       durationHours: null == durationHours
           ? _value.durationHours
           : durationHours // ignore: cast_nullable_to_non_nullable
@@ -220,6 +290,26 @@ class __$$EventImplCopyWithImpl<$Res>
       imageUrl: freezed == imageUrl
           ? _value.imageUrl
           : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      location: freezed == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as String?,
+      price: null == price
+          ? _value.price
+          : price // ignore: cast_nullable_to_non_nullable
+              as double,
+      activities: null == activities
+          ? _value._activities
+          : activities // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      creatorId: freezed == creatorId
+          ? _value.creatorId
+          : creatorId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      creatorPhone: freezed == creatorPhone
+          ? _value.creatorPhone
+          : creatorPhone // ignore: cast_nullable_to_non_nullable
               as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
@@ -238,11 +328,18 @@ class _$EventImpl implements _Event {
       required this.title,
       required this.description,
       required this.date,
+      this.endDate,
       this.durationHours = 2,
       this.maxParticipants = 20,
       this.currentParticipants = 0,
       this.imageUrl,
-      this.createdAt});
+      this.location,
+      this.price = 0,
+      final List<String> activities = const [],
+      this.creatorId,
+      this.creatorPhone,
+      this.createdAt})
+      : _activities = activities;
 
   factory _$EventImpl.fromJson(Map<String, dynamic> json) =>
       _$$EventImplFromJson(json);
@@ -263,9 +360,13 @@ class _$EventImpl implements _Event {
   @override
   final String description;
 
-  /// Date and time of the event
+  /// Date and time of the event start
   @override
   final DateTime date;
+
+  /// End date and time of the event
+  @override
+  final DateTime? endDate;
 
   /// Duration in hours
   @override
@@ -286,13 +387,42 @@ class _$EventImpl implements _Event {
   @override
   final String? imageUrl;
 
+  /// Location of the event
+  @override
+  final String? location;
+
+  /// Price per person
+  @override
+  @JsonKey()
+  final double price;
+
+  /// Activities included in the event
+  final List<String> _activities;
+
+  /// Activities included in the event
+  @override
+  @JsonKey()
+  List<String> get activities {
+    if (_activities is EqualUnmodifiableListView) return _activities;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_activities);
+  }
+
+  /// ID of the event creator
+  @override
+  final String? creatorId;
+
+  /// Phone number of the event creator
+  @override
+  final String? creatorPhone;
+
   /// When the event was created
   @override
   final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'Event(id: $id, centerId: $centerId, title: $title, description: $description, date: $date, durationHours: $durationHours, maxParticipants: $maxParticipants, currentParticipants: $currentParticipants, imageUrl: $imageUrl, createdAt: $createdAt)';
+    return 'Event(id: $id, centerId: $centerId, title: $title, description: $description, date: $date, endDate: $endDate, durationHours: $durationHours, maxParticipants: $maxParticipants, currentParticipants: $currentParticipants, imageUrl: $imageUrl, location: $location, price: $price, activities: $activities, creatorId: $creatorId, creatorPhone: $creatorPhone, createdAt: $createdAt)';
   }
 
   @override
@@ -307,6 +437,7 @@ class _$EventImpl implements _Event {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.date, date) || other.date == date) &&
+            (identical(other.endDate, endDate) || other.endDate == endDate) &&
             (identical(other.durationHours, durationHours) ||
                 other.durationHours == durationHours) &&
             (identical(other.maxParticipants, maxParticipants) ||
@@ -315,6 +446,15 @@ class _$EventImpl implements _Event {
                 other.currentParticipants == currentParticipants) &&
             (identical(other.imageUrl, imageUrl) ||
                 other.imageUrl == imageUrl) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
+            (identical(other.price, price) || other.price == price) &&
+            const DeepCollectionEquality()
+                .equals(other._activities, _activities) &&
+            (identical(other.creatorId, creatorId) ||
+                other.creatorId == creatorId) &&
+            (identical(other.creatorPhone, creatorPhone) ||
+                other.creatorPhone == creatorPhone) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
@@ -328,10 +468,16 @@ class _$EventImpl implements _Event {
       title,
       description,
       date,
+      endDate,
       durationHours,
       maxParticipants,
       currentParticipants,
       imageUrl,
+      location,
+      price,
+      const DeepCollectionEquality().hash(_activities),
+      creatorId,
+      creatorPhone,
       createdAt);
 
   @JsonKey(ignore: true)
@@ -355,10 +501,16 @@ abstract class _Event implements Event {
       required final String title,
       required final String description,
       required final DateTime date,
+      final DateTime? endDate,
       final int durationHours,
       final int maxParticipants,
       final int currentParticipants,
       final String? imageUrl,
+      final String? location,
+      final double price,
+      final List<String> activities,
+      final String? creatorId,
+      final String? creatorPhone,
       final DateTime? createdAt}) = _$EventImpl;
 
   factory _Event.fromJson(Map<String, dynamic> json) = _$EventImpl.fromJson;
@@ -381,8 +533,12 @@ abstract class _Event implements Event {
   String get description;
   @override
 
-  /// Date and time of the event
+  /// Date and time of the event start
   DateTime get date;
+  @override
+
+  /// End date and time of the event
+  DateTime? get endDate;
   @override
 
   /// Duration in hours
@@ -399,6 +555,26 @@ abstract class _Event implements Event {
 
   /// Optional image URL for the event
   String? get imageUrl;
+  @override
+
+  /// Location of the event
+  String? get location;
+  @override
+
+  /// Price per person
+  double get price;
+  @override
+
+  /// Activities included in the event
+  List<String> get activities;
+  @override
+
+  /// ID of the event creator
+  String? get creatorId;
+  @override
+
+  /// Phone number of the event creator
+  String? get creatorPhone;
   @override
 
   /// When the event was created
@@ -433,6 +609,15 @@ mixin _$EventParticipation {
   /// Optional message from the requester
   String? get message => throw _privateConstructorUsedError;
 
+  /// Phone number of the requester
+  String? get phoneNumber => throw _privateConstructorUsedError;
+
+  /// Number of persons (including family/friends)
+  int get numberOfPersons => throw _privateConstructorUsedError;
+
+  /// Additional comments
+  String? get comments => throw _privateConstructorUsedError;
+
   /// When the request was made
   DateTime? get requestedAt => throw _privateConstructorUsedError;
 
@@ -455,6 +640,9 @@ abstract class $EventParticipationCopyWith<$Res> {
       String userName,
       ParticipationStatus status,
       String? message,
+      String? phoneNumber,
+      int numberOfPersons,
+      String? comments,
       DateTime? requestedAt});
 }
 
@@ -477,6 +665,9 @@ class _$EventParticipationCopyWithImpl<$Res, $Val extends EventParticipation>
     Object? userName = null,
     Object? status = null,
     Object? message = freezed,
+    Object? phoneNumber = freezed,
+    Object? numberOfPersons = null,
+    Object? comments = freezed,
     Object? requestedAt = freezed,
   }) {
     return _then(_value.copyWith(
@@ -504,6 +695,18 @@ class _$EventParticipationCopyWithImpl<$Res, $Val extends EventParticipation>
           ? _value.message
           : message // ignore: cast_nullable_to_non_nullable
               as String?,
+      phoneNumber: freezed == phoneNumber
+          ? _value.phoneNumber
+          : phoneNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      numberOfPersons: null == numberOfPersons
+          ? _value.numberOfPersons
+          : numberOfPersons // ignore: cast_nullable_to_non_nullable
+              as int,
+      comments: freezed == comments
+          ? _value.comments
+          : comments // ignore: cast_nullable_to_non_nullable
+              as String?,
       requestedAt: freezed == requestedAt
           ? _value.requestedAt
           : requestedAt // ignore: cast_nullable_to_non_nullable
@@ -527,6 +730,9 @@ abstract class _$$EventParticipationImplCopyWith<$Res>
       String userName,
       ParticipationStatus status,
       String? message,
+      String? phoneNumber,
+      int numberOfPersons,
+      String? comments,
       DateTime? requestedAt});
 }
 
@@ -547,6 +753,9 @@ class __$$EventParticipationImplCopyWithImpl<$Res>
     Object? userName = null,
     Object? status = null,
     Object? message = freezed,
+    Object? phoneNumber = freezed,
+    Object? numberOfPersons = null,
+    Object? comments = freezed,
     Object? requestedAt = freezed,
   }) {
     return _then(_$EventParticipationImpl(
@@ -574,6 +783,18 @@ class __$$EventParticipationImplCopyWithImpl<$Res>
           ? _value.message
           : message // ignore: cast_nullable_to_non_nullable
               as String?,
+      phoneNumber: freezed == phoneNumber
+          ? _value.phoneNumber
+          : phoneNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      numberOfPersons: null == numberOfPersons
+          ? _value.numberOfPersons
+          : numberOfPersons // ignore: cast_nullable_to_non_nullable
+              as int,
+      comments: freezed == comments
+          ? _value.comments
+          : comments // ignore: cast_nullable_to_non_nullable
+              as String?,
       requestedAt: freezed == requestedAt
           ? _value.requestedAt
           : requestedAt // ignore: cast_nullable_to_non_nullable
@@ -592,6 +813,9 @@ class _$EventParticipationImpl implements _EventParticipation {
       required this.userName,
       this.status = ParticipationStatus.pending,
       this.message,
+      this.phoneNumber,
+      this.numberOfPersons = 1,
+      this.comments,
       this.requestedAt});
 
   factory _$EventParticipationImpl.fromJson(Map<String, dynamic> json) =>
@@ -622,13 +846,26 @@ class _$EventParticipationImpl implements _EventParticipation {
   @override
   final String? message;
 
+  /// Phone number of the requester
+  @override
+  final String? phoneNumber;
+
+  /// Number of persons (including family/friends)
+  @override
+  @JsonKey()
+  final int numberOfPersons;
+
+  /// Additional comments
+  @override
+  final String? comments;
+
   /// When the request was made
   @override
   final DateTime? requestedAt;
 
   @override
   String toString() {
-    return 'EventParticipation(id: $id, eventId: $eventId, userId: $userId, userName: $userName, status: $status, message: $message, requestedAt: $requestedAt)';
+    return 'EventParticipation(id: $id, eventId: $eventId, userId: $userId, userName: $userName, status: $status, message: $message, phoneNumber: $phoneNumber, numberOfPersons: $numberOfPersons, comments: $comments, requestedAt: $requestedAt)';
   }
 
   @override
@@ -643,14 +880,20 @@ class _$EventParticipationImpl implements _EventParticipation {
                 other.userName == userName) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.message, message) || other.message == message) &&
+            (identical(other.phoneNumber, phoneNumber) ||
+                other.phoneNumber == phoneNumber) &&
+            (identical(other.numberOfPersons, numberOfPersons) ||
+                other.numberOfPersons == numberOfPersons) &&
+            (identical(other.comments, comments) ||
+                other.comments == comments) &&
             (identical(other.requestedAt, requestedAt) ||
                 other.requestedAt == requestedAt));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, eventId, userId, userName, status, message, requestedAt);
+  int get hashCode => Object.hash(runtimeType, id, eventId, userId, userName,
+      status, message, phoneNumber, numberOfPersons, comments, requestedAt);
 
   @JsonKey(ignore: true)
   @override
@@ -675,6 +918,9 @@ abstract class _EventParticipation implements EventParticipation {
       required final String userName,
       final ParticipationStatus status,
       final String? message,
+      final String? phoneNumber,
+      final int numberOfPersons,
+      final String? comments,
       final DateTime? requestedAt}) = _$EventParticipationImpl;
 
   factory _EventParticipation.fromJson(Map<String, dynamic> json) =
@@ -704,6 +950,18 @@ abstract class _EventParticipation implements EventParticipation {
 
   /// Optional message from the requester
   String? get message;
+  @override
+
+  /// Phone number of the requester
+  String? get phoneNumber;
+  @override
+
+  /// Number of persons (including family/friends)
+  int get numberOfPersons;
+  @override
+
+  /// Additional comments
+  String? get comments;
   @override
 
   /// When the request was made

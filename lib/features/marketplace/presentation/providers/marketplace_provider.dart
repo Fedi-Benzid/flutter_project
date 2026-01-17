@@ -159,3 +159,70 @@ class CartNotifier extends StateNotifier<AsyncValue<List<CartItem>>> {
     }
   }
 }
+
+/// Provider for owner's products.
+final ownedItemsProvider = FutureProvider<List<MarketplaceItem>>((ref) async {
+  final repository = ref.watch(marketplaceRepositoryProvider);
+  return repository.getOwnedItems();
+});
+
+/// Provider for the marketplace notifier (product CRUD).
+final marketplaceNotifierProvider =
+    StateNotifierProvider<MarketplaceNotifier, AsyncValue<void>>((ref) {
+  final repository = ref.watch(marketplaceRepositoryProvider);
+  return MarketplaceNotifier(repository, ref);
+});
+
+/// Notifier for product management (CRUD operations).
+class MarketplaceNotifier extends StateNotifier<AsyncValue<void>> {
+  final MarketplaceRepository _repository;
+  final Ref _ref;
+
+  MarketplaceNotifier(this._repository, this._ref)
+      : super(const AsyncValue.data(null));
+
+  Future<MarketplaceItem?> createProduct(
+      Map<String, dynamic> productData) async {
+    state = const AsyncValue.loading();
+    try {
+      final product = await _repository.createItem(productData);
+      _ref.invalidate(ownedItemsProvider);
+      _ref.invalidate(allItemsProvider);
+      state = const AsyncValue.data(null);
+      return product;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return null;
+    }
+  }
+
+  Future<MarketplaceItem?> updateProduct(
+      String id, Map<String, dynamic> productData) async {
+    state = const AsyncValue.loading();
+    try {
+      final product = await _repository.updateItem(id, productData);
+      _ref.invalidate(ownedItemsProvider);
+      _ref.invalidate(allItemsProvider);
+      _ref.invalidate(itemByIdProvider(id));
+      state = const AsyncValue.data(null);
+      return product;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return null;
+    }
+  }
+
+  Future<bool> deleteProduct(String id) async {
+    state = const AsyncValue.loading();
+    try {
+      await _repository.deleteItem(id);
+      _ref.invalidate(ownedItemsProvider);
+      _ref.invalidate(allItemsProvider);
+      state = const AsyncValue.data(null);
+      return true;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return false;
+    }
+  }
+}

@@ -97,4 +97,61 @@ class CentersApiService {
       throw ApiException('Failed to create review: ${e.message}');
     }
   }
+
+  /// Create a new camping center
+  Future<Map<String, dynamic>> createCenter(
+      Map<String, dynamic> centerData) async {
+    try {
+      final response = await _dio.post(
+        AppConfig.centersPath,
+        data: centerData,
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return apiResponse['data'] as Map<String, dynamic>;
+      }
+
+      throw ApiException(apiResponse['message'] ?? 'Failed to create center');
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to create center: ${e.message}');
+    }
+  }
+
+  /// Update a camping center
+  Future<Map<String, dynamic>> updateCenter(
+      String id, Map<String, dynamic> centerData) async {
+    try {
+      final response = await _dio.put(
+        '${AppConfig.centersPath}/$id',
+        data: centerData,
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return apiResponse['data'] as Map<String, dynamic>;
+      }
+
+      throw ApiException(apiResponse['message'] ?? 'Failed to update center');
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to update center: ${e.message}');
+    }
+  }
+
+  /// Delete a camping center
+  Future<void> deleteCenter(String id) async {
+    try {
+      final response = await _dio.delete('${AppConfig.centersPath}/$id');
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] != true) {
+        throw ApiException(apiResponse['message'] ?? 'Failed to delete center');
+      }
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to delete center: ${e.message}');
+    }
+  }
 }

@@ -7,7 +7,7 @@ class MockMarketplaceRepository implements MarketplaceRepository {
   final MockServer _mockServer;
 
   MockMarketplaceRepository({MockServer? mockServer})
-    : _mockServer = mockServer ?? MockServer.instance;
+      : _mockServer = mockServer ?? MockServer.instance;
 
   @override
   Future<List<MarketplaceItem>> getItems({
@@ -53,5 +53,27 @@ class MockMarketplaceRepository implements MarketplaceRepository {
   @override
   Future<Order> checkout({String? reservationId}) async {
     return _mockServer.checkout(reservationId: reservationId);
+  }
+
+  // Product management stubs (not implemented in mock)
+  @override
+  Future<List<MarketplaceItem>> getOwnedItems() async {
+    throw UnimplementedError('Mock does not support owned items');
+  }
+
+  @override
+  Future<MarketplaceItem> createItem(Map<String, dynamic> itemData) async {
+    throw UnimplementedError('Mock does not support creating items');
+  }
+
+  @override
+  Future<MarketplaceItem> updateItem(
+      String id, Map<String, dynamic> itemData) async {
+    throw UnimplementedError('Mock does not support updating items');
+  }
+
+  @override
+  Future<void> deleteItem(String id) async {
+    throw UnimplementedError('Mock does not support deleting items');
   }
 }

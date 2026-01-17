@@ -89,4 +89,22 @@ class ReservationsApiService {
       throw ApiException('Failed to get owner reservations: ${e.message}');
     }
   }
+
+  Future<Map<String, dynamic>> updateStatus(String id, String status) async {
+    try {
+      final response = await _dio.put(
+        '${AppConfig.reservationsPath}/$id/status',
+        data: {'status': status},
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return apiResponse['data'] as Map<String, dynamic>;
+      }
+      throw ApiException(apiResponse['message'] ?? 'Failed to update status');
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to update reservation status: ${e.message}');
+    }
+  }
 }

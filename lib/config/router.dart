@@ -40,7 +40,7 @@ class AppRoutes {
   // Main routes
   static const String home = '/';
   static const String centerDetail = '/centers/:id';
-  static const String centerForm = '/centers/form';
+  static const String centerForm = '/center-form';
   static const String ownerDashboard = '/owner';
 
   // Marketplace routes
@@ -57,12 +57,13 @@ class AppRoutes {
   // Event routes
   static const String events = '/events';
   static const String eventDetail = '/events/:id';
-  static const String eventForm = '/events/form';
+  static const String eventForm = '/event-form';
 
   // Helper methods for dynamic routes
   static String centerDetailPath(String id) => '/centers/$id';
   static String itemDetailPath(String id) => '/items/$id';
-  static String reservationCalendarPath(String centerId) => '/reserve/$centerId';
+  static String reservationCalendarPath(String centerId) =>
+      '/reserve/$centerId';
   static String bookingFlowPath(String centerId) => '/booking/$centerId';
   static String eventDetailPath(String id) => '/events/$id';
 }
@@ -82,12 +83,19 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final isLoggingIn = state.matchedLocation == AppRoutes.login;
       final isRegistering = state.matchedLocation == AppRoutes.register;
-      final isForgotPassword = state.matchedLocation == AppRoutes.forgotPassword;
+      final isForgotPassword =
+          state.matchedLocation == AppRoutes.forgotPassword;
       final isVerifyingCode = state.matchedLocation == AppRoutes.verifyCode;
-      final isResettingPassword = state.matchedLocation == AppRoutes.resetPassword;
+      final isResettingPassword =
+          state.matchedLocation == AppRoutes.resetPassword;
 
       // If not logged in and not on auth pages, redirect to login
-      if (!isLoggedIn && !isLoggingIn && !isRegistering && !isForgotPassword && !isVerifyingCode && !isResettingPassword) {
+      if (!isLoggedIn &&
+          !isLoggingIn &&
+          !isRegistering &&
+          !isForgotPassword &&
+          !isVerifyingCode &&
+          !isResettingPassword) {
         return AppRoutes.login;
       }
 
@@ -208,7 +216,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Routes outside shell (full screen)
       GoRoute(
-        path: '/centers/form',
+        path: '/center-form',
         name: 'centerForm',
         builder: (context, state) {
           final centerId = state.uri.queryParameters['id'];
@@ -253,7 +261,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/events/form',
+        path: '/event-form',
         name: 'eventForm',
         builder: (context, state) {
           final eventId = state.uri.queryParameters['id'];

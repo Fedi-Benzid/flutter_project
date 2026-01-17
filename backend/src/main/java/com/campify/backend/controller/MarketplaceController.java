@@ -92,6 +92,38 @@ public class MarketplaceController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Orders fetched successfully", orders));
     }
 
+    // Owner product management endpoints
+    @PostMapping("/items")
+    public ResponseEntity<ApiResponse<MarketplaceItem>> createItem(@Valid @RequestBody MarketplaceItem item) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        MarketplaceItem createdItem = marketplaceService.createItem(item, auth.getName());
+        return new ResponseEntity<>(new ApiResponse<>(true, "Item created successfully", createdItem),
+                HttpStatus.CREATED);
+    }
+
+    @PutMapping("/items/{id}")
+    public ResponseEntity<ApiResponse<MarketplaceItem>> updateItem(
+            @PathVariable Long id,
+            @Valid @RequestBody MarketplaceItem item) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        MarketplaceItem updatedItem = marketplaceService.updateItem(id, item, auth.getName());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Item updated successfully", updatedItem));
+    }
+
+    @DeleteMapping("/items/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteItem(@PathVariable Long id) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        marketplaceService.deleteItem(id, auth.getName());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Item deleted successfully", null));
+    }
+
+    @GetMapping("/items/owned")
+    public ResponseEntity<ApiResponse<List<MarketplaceItem>>> getOwnedItems() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        List<MarketplaceItem> items = marketplaceService.getOwnedItems(auth.getName());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Owned items fetched successfully", items));
+    }
+
     @Data
     public static class AddToCartRequest {
         @NotNull

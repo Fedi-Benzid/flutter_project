@@ -57,6 +57,35 @@ public class CampingCenterService {
         campingCenterRepository.delete(center);
     }
 
+    public CampingCenter updateCenter(Long id, CampingCenter updatedCenter, String ownerEmail) {
+        CampingCenter existingCenter = getCenterById(id);
+        Long ownerId = getUserIdFromEmail(ownerEmail);
+
+        // Verify owner
+        if (existingCenter.getOwnerId() != null && !existingCenter.getOwnerId().equals(ownerId)) {
+            throw new RuntimeException("Only the center owner can update this center");
+        }
+
+        // Update fields
+        if (updatedCenter.getName() != null) {
+            existingCenter.setName(updatedCenter.getName());
+        }
+        if (updatedCenter.getDescription() != null) {
+            existingCenter.setDescription(updatedCenter.getDescription());
+        }
+        if (updatedCenter.getLocation() != null) {
+            existingCenter.setLocation(updatedCenter.getLocation());
+        }
+        if (updatedCenter.getPrice() != null) {
+            existingCenter.setPrice(updatedCenter.getPrice());
+        }
+        if (updatedCenter.getImages() != null && !updatedCenter.getImages().isEmpty()) {
+            existingCenter.setImages(updatedCenter.getImages());
+        }
+
+        return campingCenterRepository.save(existingCenter);
+    }
+
     public List<CampingCenter> getOwnedCenters(String ownerEmail) {
         Long ownerId = getUserIdFromEmail(ownerEmail);
         return campingCenterRepository.findAll().stream()

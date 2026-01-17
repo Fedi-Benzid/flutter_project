@@ -76,14 +76,48 @@ class EventDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
 
+                      // Price banner
+                      if (event.price > 0)
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.attach_money,
+                                  color: theme.colorScheme.onPrimaryContainer),
+                              const SizedBox(width: 8),
+                              Text(
+                                '${event.price.toStringAsFixed(2)} TND / person',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.onPrimaryContainer,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
                       // Date and time
                       _InfoRow(
                         icon: Icons.calendar_today,
-                        label: 'Date',
+                        label: 'Start Date',
                         value:
                             '${event.date.day}/${event.date.month}/${event.date.year}',
                       ),
                       const SizedBox(height: 8),
+                      if (event.endDate != null)
+                        _InfoRow(
+                          icon: Icons.event,
+                          label: 'End Date',
+                          value:
+                              '${event.endDate!.day}/${event.endDate!.month}/${event.endDate!.year}',
+                        ),
+                      if (event.endDate != null) const SizedBox(height: 8),
                       _InfoRow(
                         icon: Icons.access_time,
                         label: 'Time',
@@ -97,14 +131,73 @@ class EventDetailScreen extends ConsumerWidget {
                         value: '${event.durationHours} hours',
                       ),
                       const SizedBox(height: 8),
+
+                      // Location
+                      if (event.location != null && event.location!.isNotEmpty)
+                        _InfoRow(
+                          icon: Icons.location_on,
+                          label: 'Location',
+                          value: event.location!,
+                        ),
+                      if (event.location != null && event.location!.isNotEmpty)
+                        const SizedBox(height: 8),
+
+                      // Participants info
                       _InfoRow(
                         icon: Icons.people,
-                        label: 'Participants',
-                        value:
-                            '${event.currentParticipants}/${event.maxParticipants}',
-                        valueColor: isFull ? theme.colorScheme.error : null,
+                        label: 'Max Participants',
+                        value: '${event.maxParticipants}',
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 8),
+                      _InfoRow(
+                        icon: Icons.person_add,
+                        label: 'Current',
+                        value: '${event.currentParticipants}',
+                      ),
+                      const SizedBox(height: 8),
+                      _InfoRow(
+                        icon: Icons.event_available,
+                        label: 'Remaining Places',
+                        value: '${event.spotsRemaining}',
+                        valueColor:
+                            isFull ? theme.colorScheme.error : Colors.green,
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Creator phone
+                      if (event.creatorPhone != null &&
+                          event.creatorPhone!.isNotEmpty)
+                        _InfoRow(
+                          icon: Icons.phone,
+                          label: 'Contact',
+                          value: event.creatorPhone!,
+                        ),
+                      if (event.creatorPhone != null &&
+                          event.creatorPhone!.isNotEmpty)
+                        const SizedBox(height: 16),
+
+                      // Activities
+                      if (event.activities.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          'Activities',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: event.activities.map((activity) {
+                            return Chip(
+                              avatar: const Icon(Icons.sports, size: 18),
+                              label: Text(activity),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
 
                       // Description
                       Text(
@@ -165,8 +258,8 @@ class EventDetailScreen extends ConsumerWidget {
                           ),
                         ),
 
-                      // Participations (for owner)
-                      if (isOwner) ...[
+                      // Participations (for owner or event creator)
+                      if (isOwner || event.creatorId == currentUser?.id) ...[
                         const SizedBox(height: 24),
                         Text(
                           'Participation Requests',

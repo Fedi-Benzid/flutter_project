@@ -156,4 +156,52 @@ public class MarketplaceService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"))
                 .getId();
     }
+
+    // Owner product management methods
+    @Transactional
+    public MarketplaceItem createItem(MarketplaceItem item, String email) {
+        Long userId = getUserIdFromEmail(email);
+        item.setOwnerId(userId);
+        return marketplaceRepository.save(item);
+    }
+
+    @Transactional
+    public MarketplaceItem updateItem(Long id, MarketplaceItem item, String email) {
+        Long userId = getUserIdFromEmail(email);
+        MarketplaceItem existingItem = marketplaceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Marketplace item not found"));
+
+        // Verify ownership
+        if (!existingItem.getOwnerId().equals(userId)) {
+            throw new RuntimeException("You can only update your own items");
+        }
+
+        existingItem.setName(item.getName());
+        existingItem.setDescription(item.getDescription());
+        existingItem.setPrice(item.getPrice());
+        existingItem.setCategory(item.getCategory());
+        existingItem.setStock(item.getStock());
+        existingItem.setImageUrls(item.getImageUrls());
+
+        return marketplaceRepository.save(existingItem);
+    }
+
+    @Transactional
+    public void deleteItem(Long id, String email) {
+        Long userId = getUserIdFromEmail(email);
+        MarketplaceItem existingItem = marketplaceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Marketplace item not found"));
+
+        // Verify ownership
+        if (!existingItem.getOwnerId().equals(userId)) {
+            throw new RuntimeException("You can only delete your own items");
+        }
+
+        marketplaceRepository.delete(existingItem);
+    }
+
+    public List<MarketplaceItem> getOwnedItems(String email) {
+        Long userId = getUserIdFromEmail(email);
+        return marketplaceRepository.findByOwnerId(userId);
+    }
 }

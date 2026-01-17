@@ -28,4 +28,18 @@ abstract class MarketplaceRepository {
 
   /// Process checkout and create an order.
   Future<Order> checkout({String? reservationId});
+
+  // Owner product management methods
+
+  /// Get owned items for the current user.
+  Future<List<MarketplaceItem>> getOwnedItems();
+
+  /// Create a new product.
+  Future<MarketplaceItem> createItem(Map<String, dynamic> itemData);
+
+  /// Update an existing product.
+  Future<MarketplaceItem> updateItem(String id, Map<String, dynamic> itemData);
+
+  /// Delete a product.
+  Future<void> deleteItem(String id);
 }
