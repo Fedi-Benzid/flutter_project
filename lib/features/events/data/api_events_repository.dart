@@ -61,6 +61,12 @@ class ApiEventsRepository implements EventsRepository {
   }
 
   @override
+  Future<List<EventParticipation>> getMyParticipations() async {
+    final data = await _apiService.getUserParticipations();
+    return data.map((json) => _transformParticipation(json)).toList();
+  }
+
+  @override
   Future<EventParticipation> requestParticipation(String eventId) async {
     await _apiService.joinEvent(eventId);
     // Return a placeholder since the API doesn't return the participation object

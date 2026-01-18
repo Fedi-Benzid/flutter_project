@@ -20,6 +20,9 @@ abstract class EventsRepository {
   /// Get participations for an event.
   Future<List<EventParticipation>> getParticipations(String eventId);
 
+  /// Get the current user's participations across all events.
+  Future<List<EventParticipation>> getMyParticipations();
+
   /// Request to participate in an event.
   Future<EventParticipation> requestParticipation(String eventId);
 
