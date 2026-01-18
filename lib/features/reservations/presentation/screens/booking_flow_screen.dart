@@ -274,12 +274,12 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
                       data: (items) {
                         double itemsTotal = 0;
                         for (final entry in _selectedItems.entries) {
-                          final item = items.firstWhere(
-                            (i) => i.id == entry.key,
-                            orElse: () => items.first,
-                          );
-                          itemsTotal +=
-                              item.rentPricePerDay * nights * entry.value;
+                          final item =
+                              items.where((i) => i.id == entry.key).firstOrNull;
+                          if (item != null) {
+                            itemsTotal +=
+                                item.rentPricePerDay * nights * entry.value;
+                          }
                         }
                         final total = basePrice + itemsTotal;
 
@@ -404,18 +404,20 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
       double itemsTotal = 0;
 
       for (final entry in _selectedItems.entries) {
-        final item = allItems.firstWhere((i) => i.id == entry.key);
-        final itemTotal = item.rentPricePerDay * nights * entry.value;
-        itemsTotal += itemTotal;
-        items.add(
-          ReservationItem(
-            itemId: item.id,
-            itemName: item.name,
-            quantity: entry.value,
-            pricePerDay: item.rentPricePerDay,
-            totalPrice: itemTotal,
-          ),
-        );
+        final item = allItems.where((i) => i.id == entry.key).firstOrNull;
+        if (item != null) {
+          final itemTotal = item.rentPricePerDay * nights * entry.value;
+          itemsTotal += itemTotal;
+          items.add(
+            ReservationItem(
+              itemId: item.id,
+              itemName: item.name,
+              quantity: entry.value,
+              pricePerDay: item.rentPricePerDay,
+              totalPrice: itemTotal,
+            ),
+          );
+        }
       }
 
       final reservation = Reservation(
@@ -443,17 +445,87 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        _showErrorDialog(e.toString());
       }
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);
       }
     }
+  }
+
+  void _showErrorDialog(String errorMessage) {
+    // Clean up error message - remove "ApiException:" prefix if present
+    String cleanMessage = errorMessage
+        .replaceAll('ApiException:', '')
+        .replaceAll('Exception:', '')
+        .trim();
+
+    // If message contains technical details, extract the user-friendly part
+    if (cleanMessage.contains('DioException')) {
+      cleanMessage = 'Unable to process your request. Please try again.';
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        icon: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.errorContainer,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.error_outline_rounded,
+            color: Theme.of(context).colorScheme.error,
+            size: 32,
+          ),
+        ),
+        title: const Text('Reservation Failed'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              cleanMessage,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Please check your details and try again, or contact support if the issue persists.',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 }

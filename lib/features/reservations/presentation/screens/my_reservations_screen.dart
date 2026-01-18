@@ -54,41 +54,57 @@ class MyReservationsScreen extends ConsumerWidget {
           // Group reservations by status
           final upcoming = reservations
               .where(
-                (r) => r.status == ReservationStatus.approved && r.startDate.isAfter(DateTime.now()),
+                (r) =>
+                    r.status == ReservationStatus.approved &&
+                    r.startDate.isAfter(DateTime.now()),
               )
               .toList();
-          final pending = reservations.where((r) => r.status == ReservationStatus.pending).toList();
+          final pending = reservations
+              .where((r) => r.status == ReservationStatus.pending)
+              .toList();
           final past = reservations
               .where(
-                (r) => r.status == ReservationStatus.completed || r.endDate.isBefore(DateTime.now()),
+                (r) =>
+                    r.status == ReservationStatus.completed ||
+                    r.endDate.isBefore(DateTime.now()),
               )
               .toList();
           final cancelled = reservations
               .where(
-                (r) => r.status == ReservationStatus.cancelled || r.status == ReservationStatus.declined,
+                (r) =>
+                    r.status == ReservationStatus.cancelled ||
+                    r.status == ReservationStatus.declined,
               )
               .toList();
 
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              if (pending.isNotEmpty) ...[
-                _SectionHeader(title: 'Pending Approval'),
-                ...pending.map((r) => _ReservationCard(reservation: r)),
+          return RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(userReservationsProvider);
+              // Wait for the new data to load
+              await ref.read(userReservationsProvider.future);
+            },
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              children: [
+                if (pending.isNotEmpty) ...[
+                  _SectionHeader(title: 'Pending Approval'),
+                  ...pending.map((r) => _ReservationCard(reservation: r)),
+                ],
+                if (upcoming.isNotEmpty) ...[
+                  _SectionHeader(title: 'Upcoming'),
+                  ...upcoming.map((r) => _ReservationCard(reservation: r)),
+                ],
+                if (past.isNotEmpty) ...[
+                  _SectionHeader(title: 'Past'),
+                  ...past.map((r) => _ReservationCard(reservation: r)),
+                ],
+                if (cancelled.isNotEmpty) ...[
+                  _SectionHeader(title: 'Cancelled'),
+                  ...cancelled.map((r) => _ReservationCard(reservation: r)),
+                ],
               ],
-              if (upcoming.isNotEmpty) ...[
-                _SectionHeader(title: 'Upcoming'),
-                ...upcoming.map((r) => _ReservationCard(reservation: r)),
-              ],
-              if (past.isNotEmpty) ...[
-                _SectionHeader(title: 'Past'),
-                ...past.map((r) => _ReservationCard(reservation: r)),
-              ],
-              if (cancelled.isNotEmpty) ...[
-                _SectionHeader(title: 'Cancelled'),
-                ...cancelled.map((r) => _ReservationCard(reservation: r)),
-              ],
-            ],
+            ),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -240,7 +256,9 @@ class _ReservationCard extends ConsumerWidget {
                       );
 
                       if (confirm == true) {
-                        await ref.read(reservationsNotifierProvider.notifier).cancelReservation(reservation.id);
+                        await ref
+                            .read(reservationsNotifierProvider.notifier)
+                            .cancelReservation(reservation.id);
                       }
                     },
                     style: OutlinedButton.styleFrom(

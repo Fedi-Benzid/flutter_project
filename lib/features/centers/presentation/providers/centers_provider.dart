@@ -129,9 +129,10 @@ class CentersNotifier extends StateNotifier<AsyncValue<void>> {
     try {
       final created = await _repository.createCenter(center);
       state = const AsyncValue.data(null);
-      // Invalidate providers to refresh data
+      // Invalidate all providers to refresh data everywhere
       _ref.invalidate(ownedCentersProvider);
       _ref.invalidate(filteredCentersProvider);
+      _ref.invalidate(featuredCentersProvider);
       return created;
     } catch (e, st) {
       state = AsyncValue.error(e, st);

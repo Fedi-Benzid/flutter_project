@@ -105,6 +105,9 @@ class CentersApiService {
       final response = await _dio.post(
         AppConfig.centersPath,
         data: centerData,
+        options: Options(
+          contentType: Headers.jsonContentType,
+        ),
       );
       final apiResponse = response.data as Map<String, dynamic>;
 
@@ -126,6 +129,9 @@ class CentersApiService {
       final response = await _dio.put(
         '${AppConfig.centersPath}/$id',
         data: centerData,
+        options: Options(
+          contentType: Headers.jsonContentType,
+        ),
       );
       final apiResponse = response.data as Map<String, dynamic>;
 

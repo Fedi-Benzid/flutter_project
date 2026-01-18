@@ -360,7 +360,7 @@ class _ReservationManageCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Reservation #${reservation.id.substring(reservation.id.length - 6)}',
+                        'Reservation #${_safeIdSuffix(reservation.id)}',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -427,6 +427,11 @@ class _ReservationManageCard extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _safeIdSuffix(String id) {
+    if (id.length <= 6) return id;
+    return id.substring(id.length - 6);
   }
 
   String _formatDate(DateTime date) {

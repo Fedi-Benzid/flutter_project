@@ -7,12 +7,10 @@ import com.campify.backend.service.CampingCenterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -42,31 +40,8 @@ public class CampingCenterController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Center fetched successfully", center));
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<CampingCenter>> createCenter(
-            @RequestParam("name") String name,
-            @RequestParam("description") String description,
-            @RequestParam("location") String location,
-            @RequestParam("price") String price,
-            @RequestParam(value = "images", required = false) List<MultipartFile> images) {
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        CampingCenter center = CampingCenter.builder()
-                .name(name)
-                .description(description)
-                .location(location)
-                .price(price)
-                .build();
-
-        CampingCenter createdCenter = campingCenterService.createCenter(center, images, auth.getName());
-        return new ResponseEntity<>(new ApiResponse<>(true, "Center created successfully", createdCenter),
-                HttpStatus.CREATED);
-    }
-
-    // JSON-based create for simpler clients
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse<CampingCenter>> createCenterJson(@Valid @RequestBody CampingCenter center) {
+    @PostMapping
+    public ResponseEntity<ApiResponse<CampingCenter>> createCenter(@Valid @RequestBody CampingCenter center) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         CampingCenter createdCenter = campingCenterService.createCenter(center, null, auth.getName());
         return new ResponseEntity<>(new ApiResponse<>(true, "Center created successfully", createdCenter),
