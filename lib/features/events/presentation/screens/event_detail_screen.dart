@@ -394,14 +394,47 @@ class _ParticipationCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
+    // Build subtitle with date and phone number
+    final dateStr = _formatDate(participation.requestedAt);
+    final phoneStr = participation.phoneNumber;
+    final subtitleText = phoneStr != null && phoneStr.isNotEmpty
+        ? '$dateStr • 📞 $phoneStr'
+        : dateStr;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          child: Text(participation.userName.substring(0, 1).toUpperCase()),
+          child: Text(
+            participation.userName.isNotEmpty
+                ? participation.userName.substring(0, 1).toUpperCase()
+                : '?',
+          ),
         ),
         title: Text(participation.userName),
-        subtitle: Text(_formatDate(participation.requestedAt)),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(subtitleText),
+            if (phoneStr != null && phoneStr.isNotEmpty)
+              GestureDetector(
+                onTap: () {
+                  // Could launch phone dialer here
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Contact: $phoneStr')),
+                  );
+                },
+                child: Text(
+                  'Tap to call',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+          ],
+        ),
+        isThreeLine: phoneStr != null && phoneStr.isNotEmpty,
         trailing: participation.status == ParticipationStatus.pending
             ? Row(
                 mainAxisSize: MainAxisSize.min,

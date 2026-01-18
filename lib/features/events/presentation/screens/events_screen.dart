@@ -16,12 +16,18 @@ class EventsScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final eventsAsync = ref.watch(allEventsProvider);
     final isOwner = ref.watch(isOwnerProvider);
+    final currentUser = ref.watch(currentUserProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Events')),
       body: eventsAsync.when(
         data: (events) {
-          if (events.isEmpty) {
+          // Filter events for owner - only show their own events
+          final filteredEvents = isOwner && currentUser != null
+              ? events.where((e) => e.creatorId == currentUser.id).toList()
+              : events;
+
+          if (filteredEvents.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -32,10 +38,15 @@ class EventsScreen extends ConsumerWidget {
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(height: 16),
-                  Text('No events yet', style: theme.textTheme.titleLarge),
+                  Text(
+                    isOwner ? 'No events created yet' : 'No events yet',
+                    style: theme.textTheme.titleLarge,
+                  ),
                   const SizedBox(height: 8),
                   Text(
-                    'Check back later for community events',
+                    isOwner
+                        ? 'Create your first event to attract campers'
+                        : 'Check back later for community events',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -47,9 +58,13 @@ class EventsScreen extends ConsumerWidget {
 
           // Group events by upcoming and past
           final now = DateTime.now();
-          final upcoming = events.where((e) => e.date.isAfter(now)).toList()
+          final upcoming = filteredEvents
+              .where((e) => e.date.isAfter(now))
+              .toList()
             ..sort((a, b) => a.date.compareTo(b.date));
-          final past = events.where((e) => e.date.isBefore(now)).toList()
+          final past = filteredEvents
+              .where((e) => e.date.isBefore(now))
+              .toList()
             ..sort((a, b) => b.date.compareTo(a.date));
 
           return ListView(
@@ -170,9 +185,8 @@ class _EventCard extends StatelessWidget {
                       event.title,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: isPast
-                            ? theme.colorScheme.onSurfaceVariant
-                            : null,
+                        color:
+                            isPast ? theme.colorScheme.onSurfaceVariant : null,
                       ),
                     ),
                     const SizedBox(height: 4),

@@ -135,15 +135,28 @@ class ApiEventsRepository implements EventsRepository {
 
   EventParticipation _transformParticipation(Map<String, dynamic> json) {
     final userJson = json['user'] as Map<String, dynamic>?;
-    final userName = userJson != null
-        ? '${userJson['firstName'] ?? ''} ${userJson['lastName'] ?? ''}'.trim()
-        : 'Unknown';
+
+    String userName = 'Unknown';
+    String? phoneNumber;
+    String? userEmail;
+
+    if (userJson != null) {
+      final firstName = userJson['firstName'] as String? ?? '';
+      final lastName = userJson['lastName'] as String? ?? '';
+      userName = '$firstName $lastName'.trim();
+      if (userName.isEmpty) {
+        userName = userJson['email'] as String? ?? 'Unknown';
+      }
+      phoneNumber = userJson['phoneNumber'] as String?;
+      userEmail = userJson['email'] as String?;
+    }
 
     return EventParticipation(
       id: json['id'].toString(),
       eventId: json['eventId'].toString(),
       userId: json['userId'].toString(),
-      userName: userName.isNotEmpty ? userName : 'Unknown',
+      userName: userName,
+      phoneNumber: phoneNumber,
       status: _parseParticipationStatus(json['status'] as String?),
       requestedAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
