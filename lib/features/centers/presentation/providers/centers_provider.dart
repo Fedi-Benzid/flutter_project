@@ -51,7 +51,9 @@ final centerReviewsProvider = FutureProvider.family<List<Review>, String>((
 });
 
 /// Provider for centers owned by the current user.
-final ownedCentersProvider = FutureProvider<List<CampingCenter>>((ref) async {
+/// Using autoDispose to refresh data when navigating back to the screen.
+final ownedCentersProvider =
+    FutureProvider.autoDispose<List<CampingCenter>>((ref) async {
   final repository = ref.watch(centersRepositoryProvider);
   return repository.getOwnedCenters();
 });

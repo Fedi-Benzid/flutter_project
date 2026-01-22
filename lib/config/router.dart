@@ -205,6 +205,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const MyReservationsScreen(),
           ),
 
+          // Owner Dashboard (inside shell for bottom nav)
+          GoRoute(
+            path: AppRoutes.ownerDashboard,
+            name: 'ownerDashboard',
+            builder: (context, state) => const OwnerDashboardScreen(),
+          ),
+
           // Profile
           GoRoute(
             path: AppRoutes.profile,
@@ -222,11 +229,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           final centerId = state.uri.queryParameters['id'];
           return CenterFormScreen(centerId: centerId);
         },
-      ),
-      GoRoute(
-        path: AppRoutes.ownerDashboard,
-        name: 'ownerDashboard',
-        builder: (context, state) => const OwnerDashboardScreen(),
       ),
       GoRoute(
         path: AppRoutes.cart,

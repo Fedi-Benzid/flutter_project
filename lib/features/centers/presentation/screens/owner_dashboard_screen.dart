@@ -134,7 +134,7 @@ class _OwnerCenterCard extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
-        onTap: () => context.push(AppRoutes.centerDetailPath(center.id)),
+        onTap: () => context.go(AppRoutes.centerDetailPath(center.id)),
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -304,7 +304,13 @@ class _ReservationsTab extends ConsumerWidget {
     final reservationsAsync = ref.watch(ownerReservationsProvider);
 
     return reservationsAsync.when(
-      data: (reservations) {
+      data: (allReservations) {
+        // Filter out cancelled and declined reservations for owner view
+        final reservations = allReservations
+            .where((r) =>
+                r.status != ReservationStatus.cancelled &&
+                r.status != ReservationStatus.declined)
+            .toList();
         if (reservations.isEmpty) {
           return Center(
             child: Column(
