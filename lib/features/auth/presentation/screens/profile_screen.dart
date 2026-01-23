@@ -98,7 +98,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   CircleAvatar(
                     radius: 60,
                     backgroundColor: theme.colorScheme.primaryContainer,
-                    backgroundImage: user.avatarUrl != null ? NetworkImage(user.avatarUrl!) : null,
+                    backgroundImage: user.avatarUrl != null
+                        ? NetworkImage(user.avatarUrl!)
+                        : null,
                     child: user.avatarUrl == null
                         ? Text(
                             user.name.substring(0, 1).toUpperCase(),
@@ -151,13 +153,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: user.role == UserRole.owner ? theme.colorScheme.secondaryContainer : theme.colorScheme.tertiaryContainer,
+                  color: user.role == UserRole.owner
+                      ? theme.colorScheme.secondaryContainer
+                      : theme.colorScheme.tertiaryContainer,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   user.role == UserRole.owner ? 'Center Owner' : 'Camper',
                   style: theme.textTheme.labelMedium?.copyWith(
-                    color: user.role == UserRole.owner ? theme.colorScheme.onSecondaryContainer : theme.colorScheme.onTertiaryContainer,
+                    color: user.role == UserRole.owner
+                        ? theme.colorScheme.onSecondaryContainer
+                        : theme.colorScheme.onTertiaryContainer,
                   ),
                 ),
               ),
@@ -195,11 +201,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 title: 'Phone',
                 value: user.phone ?? 'Not set',
               ),
-              _ProfileInfoItem(
+              _ProfileCard(
                 icon: Icons.calendar_today_outlined,
-                label: 'Member Since',
-                value: user?.createdAt != null ? _formatDate(user!.createdAt!) : 'N/A',
-                onTap: () => _showDatePicker(context, user),
+                title: 'Member Since',
+                value: user.createdAt != null
+                    ? _formatDate(user.createdAt!)
+                    : 'N/A',
               ),
 
               const SizedBox(height: 32),
@@ -310,8 +317,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 decoration: InputDecoration(
                   labelText: 'Current Password',
                   suffixIcon: IconButton(
-                    icon: Icon(obscureOld ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () => setDialogState(() => obscureOld = !obscureOld),
+                    icon: Icon(
+                        obscureOld ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () =>
+                        setDialogState(() => obscureOld = !obscureOld),
                   ),
                 ),
               ),
@@ -322,8 +331,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 decoration: InputDecoration(
                   labelText: 'New Password',
                   suffixIcon: IconButton(
-                    icon: Icon(obscureNew ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () => setDialogState(() => obscureNew = !obscureNew),
+                    icon: Icon(
+                        obscureNew ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () =>
+                        setDialogState(() => obscureNew = !obscureNew),
                   ),
                 ),
               ),
@@ -334,8 +345,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 decoration: InputDecoration(
                   labelText: 'Confirm New Password',
                   suffixIcon: IconButton(
-                    icon: Icon(obscureConfirm ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () => setDialogState(() => obscureConfirm = !obscureConfirm),
+                    icon: Icon(obscureConfirm
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: () =>
+                        setDialogState(() => obscureConfirm = !obscureConfirm),
                   ),
                 ),
               ),
@@ -350,23 +364,29 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               onPressed: isLoading
                   ? null
                   : () async {
-                      if (newPasswordController.text != confirmPasswordController.text) {
+                      if (newPasswordController.text !=
+                          confirmPasswordController.text) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('New passwords do not match')),
+                          const SnackBar(
+                              content: Text('New passwords do not match')),
                         );
                         return;
                       }
 
                       if (newPasswordController.text.length < 6) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Password must be at least 6 characters')),
+                          const SnackBar(
+                              content: Text(
+                                  'Password must be at least 6 characters')),
                         );
                         return;
                       }
 
                       setDialogState(() => isLoading = true);
                       try {
-                        await ref.read(authStateProvider.notifier).changePassword(
+                        await ref
+                            .read(authStateProvider.notifier)
+                            .changePassword(
                               oldPassword: oldPasswordController.text,
                               newPassword: newPasswordController.text,
                             );
@@ -374,7 +394,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         if (mounted) {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Password changed successfully')),
+                            const SnackBar(
+                                content: Text('Password changed successfully')),
                           );
                         }
                       } catch (e) {
@@ -382,8 +403,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           setDialogState(() => isLoading = false);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(e.toString().replaceAll('AuthException: ', '')),
-                              backgroundColor: Theme.of(context).colorScheme.error,
+                              content: Text(e
+                                  .toString()
+                                  .replaceAll('AuthException: ', '')),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.error,
                             ),
                           );
                         }
@@ -393,7 +417,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ? const SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
                     )
                   : const Text('Change'),
             ),
@@ -426,13 +451,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         if (mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(const SnackBar(content: Text('Profile photo updated')));
+          ).showSnackBar(
+              const SnackBar(content: Text('Profile photo updated')));
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('Failed to update profile photo: $e')));
+          ).showSnackBar(
+              SnackBar(content: Text('Failed to update profile photo: $e')));
         }
       } finally {
         if (mounted) {
@@ -447,7 +474,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     final success = await ref.read(authStateProvider.notifier).updateProfile(
           name: _nameController.text.trim(),
-          phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
+          phone: _phoneController.text.trim().isEmpty
+              ? null
+              : _phoneController.text.trim(),
         );
 
     setState(() {

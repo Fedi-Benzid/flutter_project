@@ -24,8 +24,7 @@ _$CampingCenterImpl _$$CampingCenterImplFromJson(Map<String, dynamic> json) =>
       tags:
           (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
               const [],
-      priceMin: (json['priceMin'] as num?)?.toDouble() ?? 0,
-      priceMax: (json['priceMax'] as num?)?.toDouble() ?? 0,
+      price: (json['price'] as num?)?.toDouble() ?? 0,
       isInteresting: json['isInteresting'] as bool? ?? false,
       averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0,
       reviewCount: (json['reviewCount'] as num?)?.toInt() ?? 0,
@@ -46,8 +45,7 @@ Map<String, dynamic> _$$CampingCenterImplToJson(_$CampingCenterImpl instance) =>
       'photos': instance.photos,
       'amenities': instance.amenities,
       'tags': instance.tags,
-      'priceMin': instance.priceMin,
-      'priceMax': instance.priceMax,
+      'price': instance.price,
       'isInteresting': instance.isInteresting,
       'averageRating': instance.averageRating,
       'reviewCount': instance.reviewCount,

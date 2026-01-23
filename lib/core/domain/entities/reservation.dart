@@ -56,6 +56,15 @@ class Reservation with _$Reservation {
     /// ID of the user making the reservation
     required String userId,
 
+    /// Name of the camper (for owner view)
+    String? userName,
+
+    /// Email of the camper (for owner view)
+    String? userEmail,
+
+    /// Phone of the camper (for owner view)
+    String? userPhone,
+
     /// ID of the camping center
     required String centerId,
 

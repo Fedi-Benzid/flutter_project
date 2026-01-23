@@ -211,7 +211,7 @@ class _OwnerCenterCard extends ConsumerWidget {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          '${center.priceMin.toInt()}-${center.priceMax.toInt()} TND/night',
+                          '${center.price.toInt()} TND/night',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.primary,
                             fontWeight: FontWeight.bold,
@@ -382,6 +382,58 @@ class _ReservationManageCard extends ConsumerWidget {
                 _StatusChip(status: reservation.status),
               ],
             ),
+            // Camper Details Section
+            if (reservation.userName != null ||
+                reservation.userEmail != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Camper Details',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    if (reservation.userName != null)
+                      Row(
+                        children: [
+                          const Icon(Icons.person, size: 16),
+                          const SizedBox(width: 8),
+                          Text(reservation.userName!),
+                        ],
+                      ),
+                    if (reservation.userEmail != null) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.email, size: 16),
+                          const SizedBox(width: 8),
+                          Text(reservation.userEmail!),
+                        ],
+                      ),
+                    ],
+                    if (reservation.userPhone != null) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.phone, size: 16),
+                          const SizedBox(width: 8),
+                          Text(reservation.userPhone!),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
             const Divider(height: 24),
             Row(
               children: [

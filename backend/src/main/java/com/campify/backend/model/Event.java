@@ -32,7 +32,7 @@ public class Event {
     @NotNull
     private Long centerId;
 
-    @NotNull
+    // ownerId is set automatically from JWT - no validation needed
     private Long ownerId;
 
     @NotNull
@@ -47,6 +47,9 @@ public class Event {
     private Integer maxParticipants;
 
     private String imageUrl;
+
+    @Transient
+    private Integer currentParticipants;
 
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

@@ -22,8 +22,14 @@ public class CampingCenterController {
     private final CampingCenterService campingCenterService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CampingCenter>>> getAllCenters() {
-        List<CampingCenter> centers = campingCenterService.getAllCenters();
+    public ResponseEntity<ApiResponse<List<CampingCenter>>> getAllCenters(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) List<String> tags) {
+        List<CampingCenter> centers = campingCenterService.getCentersFiltered(
+                name, location, minPrice, maxPrice, tags);
         return ResponseEntity.ok(new ApiResponse<>(true, "Centers fetched successfully", centers));
     }
 

@@ -66,6 +66,7 @@ class ApiReservationsRepository implements ReservationsRepository {
   }
 
   Reservation _transformReservation(Map<String, dynamic> json) {
+    final userJson = json['user'] as Map<String, dynamic>?;
     final centerJson = json['center'] as Map<String, dynamic>?;
     final checkIn = json['checkInDate'] as String?;
     final checkOut = json['checkOutDate'] as String?;
@@ -73,7 +74,10 @@ class ApiReservationsRepository implements ReservationsRepository {
 
     return Reservation(
       id: json['id'].toString(),
-      userId: (json['user'] as Map<String, dynamic>?)?['id']?.toString() ?? '',
+      userId: userJson?['id']?.toString() ?? '',
+      userName: userJson?['name'] as String?,
+      userEmail: userJson?['email'] as String?,
+      userPhone: userJson?['phone'] as String?,
       centerId: centerJson?['id']?.toString() ?? '',
       startDate: checkIn != null ? DateTime.parse(checkIn) : DateTime.now(),
       endDate: checkOut != null ? DateTime.parse(checkOut) : DateTime.now(),

@@ -24,15 +24,27 @@ public class MarketplaceService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
 
-    public List<MarketplaceItem> getAllItems(Long centerId, MarketplaceItem.ItemCategory category) {
+    public List<MarketplaceItem> getAllItems(Long centerId, MarketplaceItem.ItemCategory category, String search) {
+        List<MarketplaceItem> items;
         if (centerId != null && category != null) {
-            return marketplaceRepository.findByCenterIdAndCategory(centerId, category);
+            items = marketplaceRepository.findByCenterIdAndCategory(centerId, category);
         } else if (centerId != null) {
-            return marketplaceRepository.findByCenterId(centerId);
+            items = marketplaceRepository.findByCenterId(centerId);
         } else if (category != null) {
-            return marketplaceRepository.findByCategory(category);
+            items = marketplaceRepository.findByCategory(category);
+        } else {
+            items = marketplaceRepository.findAll();
         }
-        return marketplaceRepository.findAll();
+
+        // Apply search filter if provided
+        if (search != null && !search.isEmpty()) {
+            items = items.stream()
+                    .filter(item -> item.getName().toLowerCase().contains(search.toLowerCase()) ||
+                            (item.getDescription() != null &&
+                                    item.getDescription().toLowerCase().contains(search.toLowerCase())))
+                    .toList();
+        }
+        return items;
     }
 
     public MarketplaceItem getItemById(Long id) {

@@ -51,7 +51,7 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
       appBar: AppBar(title: const Text('Complete Booking')),
       body: centerAsync.when(
         data: (center) {
-          final basePrice = nights * (center.priceMin + center.priceMax) / 2;
+          final basePrice = nights * center.price;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -394,7 +394,7 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
     try {
       final startDate = widget.startDate ?? DateTime.now();
       final endDate = widget.endDate ?? startDate.add(const Duration(days: 1));
-      final basePrice = nights * (center.priceMin + center.priceMax) / 2;
+      final basePrice = nights * center.price;
 
       // Build reservation items
       final items = <ReservationItem>[];

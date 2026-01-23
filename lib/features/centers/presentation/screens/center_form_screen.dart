@@ -143,40 +143,19 @@ class _CenterFormScreenState extends ConsumerState<CenterFormScreen> {
               ),
               const SizedBox(height: 16),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: FormBuilderTextField(
-                      name: 'priceMin',
-                      initialValue: _existingCenter?.priceMin.toString() ?? '',
-                      decoration: const InputDecoration(
-                        labelText: 'Min Price *',
-                        suffixText: ' TND',
-                      ),
-                      keyboardType: TextInputType.number,
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(),
-                        FormBuilderValidators.numeric(),
-                      ]),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: FormBuilderTextField(
-                      name: 'priceMax',
-                      initialValue: _existingCenter?.priceMax.toString() ?? '',
-                      decoration: const InputDecoration(
-                        labelText: 'Max Price *',
-                        suffixText: ' TND',
-                      ),
-                      keyboardType: TextInputType.number,
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(),
-                        FormBuilderValidators.numeric(),
-                      ]),
-                    ),
-                  ),
-                ],
+              FormBuilderTextField(
+                name: 'price',
+                initialValue: _existingCenter?.price.toString() ?? '',
+                decoration: const InputDecoration(
+                  labelText: 'Price per Night *',
+                  suffixText: ' TND',
+                  prefixIcon: Icon(Icons.attach_money),
+                ),
+                keyboardType: TextInputType.number,
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(),
+                  FormBuilderValidators.numeric(),
+                ]),
               ),
               const SizedBox(height: 24),
 
@@ -332,8 +311,7 @@ class _CenterFormScreenState extends ConsumerState<CenterFormScreen> {
         name: values['name'] as String,
         description: values['description'] as String,
         location: values['location'] as String,
-        priceMin: double.parse(values['priceMin'] as String),
-        priceMax: double.parse(values['priceMax'] as String),
+        price: double.parse(values['price'] as String),
         tags: _selectedTags,
         amenities: _selectedAmenities,
         photos: photos,

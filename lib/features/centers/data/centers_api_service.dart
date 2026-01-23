@@ -7,10 +7,27 @@ import '../../../core/network/api_exception.dart';
 class CentersApiService {
   final Dio _dio = ApiClient().dio;
 
-  /// Get all camping centers
-  Future<List<Map<String, dynamic>>> getCenters() async {
+  /// Get all camping centers with optional filters
+  Future<List<Map<String, dynamic>>> getCenters({
+    String? name,
+    String? location,
+    double? minPrice,
+    double? maxPrice,
+    List<String>? tags,
+  }) async {
     try {
-      final response = await _dio.get(AppConfig.centersPath);
+      final queryParams = <String, dynamic>{};
+      if (name != null && name.isNotEmpty) queryParams['name'] = name;
+      if (location != null && location.isNotEmpty)
+        queryParams['location'] = location;
+      if (minPrice != null) queryParams['minPrice'] = minPrice;
+      if (maxPrice != null) queryParams['maxPrice'] = maxPrice;
+      if (tags != null && tags.isNotEmpty) queryParams['tags'] = tags;
+
+      final response = await _dio.get(
+        AppConfig.centersPath,
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+      );
       final apiResponse = response.data as Map<String, dynamic>;
 
       if (apiResponse['success'] == true && apiResponse['data'] != null) {
@@ -95,6 +112,50 @@ class CentersApiService {
     } on DioException catch (e) {
       if (e.error is ApiException) rethrow;
       throw ApiException('Failed to create review: ${e.message}');
+    }
+  }
+
+  /// Update a review (only by the author)
+  Future<Map<String, dynamic>> updateReview(
+      String reviewId, int rating, String comment) async {
+    try {
+      final response = await _dio.put(
+        '${AppConfig.centersPath}/reviews/$reviewId',
+        data: {'rating': rating, 'comment': comment},
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return apiResponse['data'] as Map<String, dynamic>;
+      }
+
+      throw ApiException(apiResponse['message'] ?? 'Failed to update review');
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 403) {
+        throw ApiException('Only the review author can update this review');
+      }
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to update review: ${e.message}');
+    }
+  }
+
+  /// Delete a review (only by the author)
+  Future<void> deleteReview(String reviewId) async {
+    try {
+      final response = await _dio.delete(
+        '${AppConfig.centersPath}/reviews/$reviewId',
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] != true) {
+        throw ApiException(apiResponse['message'] ?? 'Failed to delete review');
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 403) {
+        throw ApiException('Only the review author can delete this review');
+      }
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to delete review: ${e.message}');
     }
   }
 

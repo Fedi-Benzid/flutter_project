@@ -21,15 +21,28 @@ public class EventService {
     private final UserRepository userRepository;
 
     public List<Event> getAllEvents(Long centerId) {
+        List<Event> events;
         if (centerId != null) {
-            return eventRepository.findByCenterId(centerId);
+            events = eventRepository.findByCenterId(centerId);
+        } else {
+            events = eventRepository.findAll();
         }
-        return eventRepository.findAll();
+        // Populate current participants count
+        events.forEach(this::populateParticipantCount);
+        return events;
     }
 
     public Event getEventById(Long id) {
-        return eventRepository.findById(id)
+        Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
+        populateParticipantCount(event);
+        return event;
+    }
+
+    private void populateParticipantCount(Event event) {
+        long count = participationRepository.countByEventIdAndStatus(
+                event.getId(), EventParticipation.ParticipationStatus.APPROVED);
+        event.setCurrentParticipants((int) count);
     }
 
     public Event createEvent(Event event, String ownerEmail) {

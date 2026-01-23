@@ -185,6 +185,20 @@ class CentersNotifier extends StateNotifier<AsyncValue<void>> {
     }
   }
 
+  Future<Review?> updateReview(String id, Review review) async {
+    state = const AsyncValue.loading();
+    try {
+      final updated = await _repository.updateReview(id, review);
+      state = const AsyncValue.data(null);
+      _ref.invalidate(centerReviewsProvider(review.centerId));
+      _ref.invalidate(centerByIdProvider(review.centerId));
+      return updated;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return null;
+    }
+  }
+
   Future<bool> deleteReview(String id, String centerId) async {
     state = const AsyncValue.loading();
     try {

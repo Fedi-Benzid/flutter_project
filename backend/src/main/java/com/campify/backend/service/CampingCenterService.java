@@ -26,6 +26,27 @@ public class CampingCenterService {
         return campingCenterRepository.findAll();
     }
 
+    public List<CampingCenter> getCentersFiltered(String name, String location,
+            Double minPrice, Double maxPrice, List<String> tags) {
+        return campingCenterRepository.findAll().stream()
+                .filter(c -> name == null || c.getName().toLowerCase().contains(name.toLowerCase()))
+                .filter(c -> location == null || c.getLocation().toLowerCase().contains(location.toLowerCase()))
+                .filter(c -> minPrice == null || (c.getPrice() != null &&
+                        extractPrice(c.getPrice()) >= minPrice))
+                .filter(c -> maxPrice == null || (c.getPrice() != null &&
+                        extractPrice(c.getPrice()) <= maxPrice))
+                // Tags filter not supported - CampingCenter model doesn't have tags field
+                .toList();
+    }
+
+    private double extractPrice(String price) {
+        try {
+            return Double.parseDouble(price.replaceAll("[^0-9.]", ""));
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+
     public CampingCenter getCenterById(Long id) {
         return campingCenterRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("CampingCenter", "id", id));

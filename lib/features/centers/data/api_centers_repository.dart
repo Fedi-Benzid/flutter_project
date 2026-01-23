@@ -14,21 +14,16 @@ class ApiCentersRepository implements CentersRepository {
     String? search,
     List<String>? tags,
     bool? isInteresting,
+    double? minPrice,
+    double? maxPrice,
   }) async {
-    final data = await _apiService.getCenters();
-    var centers = data.map((json) => _transformCenter(json)).toList();
-
-    // Apply local filtering
-    if (search != null && search.isNotEmpty) {
-      centers = centers
-          .where((c) =>
-              c.name.toLowerCase().contains(search.toLowerCase()) ||
-              c.description.toLowerCase().contains(search.toLowerCase()) ||
-              c.location.toLowerCase().contains(search.toLowerCase()))
-          .toList();
-    }
-
-    return centers;
+    final data = await _apiService.getCenters(
+      name: search,
+      tags: tags,
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+    );
+    return data.map((json) => _transformCenter(json)).toList();
   }
 
   @override
@@ -61,7 +56,7 @@ class ApiCentersRepository implements CentersRepository {
       'name': center.name,
       'description': center.description,
       'location': center.location,
-      'price': '${center.priceMin.toStringAsFixed(0)} TND/night',
+      'price': '${center.price.toInt()} TND/night',
       'images': center.photos,
     };
   }
@@ -84,12 +79,17 @@ class ApiCentersRepository implements CentersRepository {
 
   @override
   Future<Review> updateReview(String id, Review review) async {
-    throw UnimplementedError('Update review not yet implemented');
+    final data = await _apiService.updateReview(
+      id,
+      review.rating,
+      review.comment ?? '',
+    );
+    return _transformReview(data);
   }
 
   @override
   Future<void> deleteReview(String id) async {
-    throw UnimplementedError('Delete review not yet implemented');
+    await _apiService.deleteReview(id);
   }
 
   @override
@@ -119,8 +119,7 @@ class ApiCentersRepository implements CentersRepository {
       description: json['description'] as String? ?? '',
       location: json['location'] as String? ?? '',
       photos: images.map((e) => e.toString()).toList(),
-      priceMin: priceValue,
-      priceMax: priceValue,
+      price: priceValue,
       isInteresting: true, // Default to true for display
     );
   }

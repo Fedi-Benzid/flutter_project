@@ -7,12 +7,16 @@ import '../../../core/network/api_exception.dart';
 class MarketplaceApiService {
   final Dio _dio = ApiClient().dio;
 
-  Future<List<Map<String, dynamic>>> getItems(
-      {String? centerId, String? category}) async {
+  Future<List<Map<String, dynamic>>> getItems({
+    String? centerId,
+    String? category,
+    String? search,
+  }) async {
     try {
       final queryParams = <String, dynamic>{};
       if (centerId != null) queryParams['centerId'] = centerId;
       if (category != null) queryParams['category'] = category;
+      if (search != null && search.isNotEmpty) queryParams['search'] = search;
 
       final response = await _dio.get(
         '${AppConfig.marketplacePath}/items',

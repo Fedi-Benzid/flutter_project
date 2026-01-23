@@ -245,7 +245,7 @@ class _CenterDetailScreenState extends ConsumerState<CenterDetailScreen> {
                             style: theme.textTheme.bodyMedium,
                           ),
                           Text(
-                            '${center.priceMin.toInt()} - ${center.priceMax.toInt()} TND',
+                            '${center.price.toInt()} TND',
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: theme.colorScheme.primary,

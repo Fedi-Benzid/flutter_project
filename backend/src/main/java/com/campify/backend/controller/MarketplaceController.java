@@ -28,8 +28,9 @@ public class MarketplaceController {
     @GetMapping("/items")
     public ResponseEntity<ApiResponse<List<MarketplaceItem>>> getAllItems(
             @RequestParam(required = false) Long centerId,
-            @RequestParam(required = false) MarketplaceItem.ItemCategory category) {
-        List<MarketplaceItem> items = marketplaceService.getAllItems(centerId, category);
+            @RequestParam(required = false) MarketplaceItem.ItemCategory category,
+            @RequestParam(required = false) String search) {
+        List<MarketplaceItem> items = marketplaceService.getAllItems(centerId, category, search);
         return ResponseEntity.ok(new ApiResponse<>(true, "Items fetched successfully", items));
     }
 

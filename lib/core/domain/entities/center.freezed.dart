@@ -47,11 +47,8 @@ mixin _$CampingCenter {
   /// See CenterTags in constants.dart for available options
   List<String> get tags => throw _privateConstructorUsedError;
 
-  /// Minimum price per night
-  double get priceMin => throw _privateConstructorUsedError;
-
-  /// Maximum price per night
-  double get priceMax => throw _privateConstructorUsedError;
+  /// Price per night in TND
+  double get price => throw _privateConstructorUsedError;
 
   /// Whether this center is featured/interesting
   /// Used for discovery and recommendations
@@ -93,8 +90,7 @@ abstract class $CampingCenterCopyWith<$Res> {
       List<String> photos,
       List<String> amenities,
       List<String> tags,
-      double priceMin,
-      double priceMax,
+      double price,
       bool isInteresting,
       double averageRating,
       int reviewCount,
@@ -124,8 +120,7 @@ class _$CampingCenterCopyWithImpl<$Res, $Val extends CampingCenter>
     Object? photos = null,
     Object? amenities = null,
     Object? tags = null,
-    Object? priceMin = null,
-    Object? priceMax = null,
+    Object? price = null,
     Object? isInteresting = null,
     Object? averageRating = null,
     Object? reviewCount = null,
@@ -166,13 +161,9 @@ class _$CampingCenterCopyWithImpl<$Res, $Val extends CampingCenter>
           ? _value.tags
           : tags // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      priceMin: null == priceMin
-          ? _value.priceMin
-          : priceMin // ignore: cast_nullable_to_non_nullable
-              as double,
-      priceMax: null == priceMax
-          ? _value.priceMax
-          : priceMax // ignore: cast_nullable_to_non_nullable
+      price: null == price
+          ? _value.price
+          : price // ignore: cast_nullable_to_non_nullable
               as double,
       isInteresting: null == isInteresting
           ? _value.isInteresting
@@ -219,8 +210,7 @@ abstract class _$$CampingCenterImplCopyWith<$Res>
       List<String> photos,
       List<String> amenities,
       List<String> tags,
-      double priceMin,
-      double priceMax,
+      double price,
       bool isInteresting,
       double averageRating,
       int reviewCount,
@@ -248,8 +238,7 @@ class __$$CampingCenterImplCopyWithImpl<$Res>
     Object? photos = null,
     Object? amenities = null,
     Object? tags = null,
-    Object? priceMin = null,
-    Object? priceMax = null,
+    Object? price = null,
     Object? isInteresting = null,
     Object? averageRating = null,
     Object? reviewCount = null,
@@ -290,13 +279,9 @@ class __$$CampingCenterImplCopyWithImpl<$Res>
           ? _value._tags
           : tags // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      priceMin: null == priceMin
-          ? _value.priceMin
-          : priceMin // ignore: cast_nullable_to_non_nullable
-              as double,
-      priceMax: null == priceMax
-          ? _value.priceMax
-          : priceMax // ignore: cast_nullable_to_non_nullable
+      price: null == price
+          ? _value.price
+          : price // ignore: cast_nullable_to_non_nullable
               as double,
       isInteresting: null == isInteresting
           ? _value.isInteresting
@@ -338,8 +323,7 @@ class _$CampingCenterImpl implements _CampingCenter {
       final List<String> photos = const [],
       final List<String> amenities = const [],
       final List<String> tags = const [],
-      this.priceMin = 0,
-      this.priceMax = 0,
+      this.price = 0,
       this.isInteresting = false,
       this.averageRating = 0,
       this.reviewCount = 0,
@@ -415,15 +399,10 @@ class _$CampingCenterImpl implements _CampingCenter {
     return EqualUnmodifiableListView(_tags);
   }
 
-  /// Minimum price per night
+  /// Price per night in TND
   @override
   @JsonKey()
-  final double priceMin;
-
-  /// Maximum price per night
-  @override
-  @JsonKey()
-  final double priceMax;
+  final double price;
 
   /// Whether this center is featured/interesting
   /// Used for discovery and recommendations
@@ -455,7 +434,7 @@ class _$CampingCenterImpl implements _CampingCenter {
 
   @override
   String toString() {
-    return 'CampingCenter(id: $id, ownerId: $ownerId, name: $name, description: $description, location: $location, photos: $photos, amenities: $amenities, tags: $tags, priceMin: $priceMin, priceMax: $priceMax, isInteresting: $isInteresting, averageRating: $averageRating, reviewCount: $reviewCount, latitude: $latitude, longitude: $longitude, createdAt: $createdAt)';
+    return 'CampingCenter(id: $id, ownerId: $ownerId, name: $name, description: $description, location: $location, photos: $photos, amenities: $amenities, tags: $tags, price: $price, isInteresting: $isInteresting, averageRating: $averageRating, reviewCount: $reviewCount, latitude: $latitude, longitude: $longitude, createdAt: $createdAt)';
   }
 
   @override
@@ -474,10 +453,7 @@ class _$CampingCenterImpl implements _CampingCenter {
             const DeepCollectionEquality()
                 .equals(other._amenities, _amenities) &&
             const DeepCollectionEquality().equals(other._tags, _tags) &&
-            (identical(other.priceMin, priceMin) ||
-                other.priceMin == priceMin) &&
-            (identical(other.priceMax, priceMax) ||
-                other.priceMax == priceMax) &&
+            (identical(other.price, price) || other.price == price) &&
             (identical(other.isInteresting, isInteresting) ||
                 other.isInteresting == isInteresting) &&
             (identical(other.averageRating, averageRating) ||
@@ -504,8 +480,7 @@ class _$CampingCenterImpl implements _CampingCenter {
       const DeepCollectionEquality().hash(_photos),
       const DeepCollectionEquality().hash(_amenities),
       const DeepCollectionEquality().hash(_tags),
-      priceMin,
-      priceMax,
+      price,
       isInteresting,
       averageRating,
       reviewCount,
@@ -537,8 +512,7 @@ abstract class _CampingCenter implements CampingCenter {
       final List<String> photos,
       final List<String> amenities,
       final List<String> tags,
-      final double priceMin,
-      final double priceMax,
+      final double price,
       final bool isInteresting,
       final double averageRating,
       final int reviewCount,
@@ -586,12 +560,8 @@ abstract class _CampingCenter implements CampingCenter {
   List<String> get tags;
   @override
 
-  /// Minimum price per night
-  double get priceMin;
-  @override
-
-  /// Maximum price per night
-  double get priceMax;
+  /// Price per night in TND
+  double get price;
   @override
 
   /// Whether this center is featured/interesting

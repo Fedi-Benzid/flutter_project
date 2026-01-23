@@ -65,7 +65,7 @@ class _ReservationCalendarScreenState
                           ),
                         ),
                         Text(
-                          '${center.priceMin.toInt()} - ${center.priceMax.toInt()} TND / night',
+                          '${center.price.toInt()} TND / night',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.primary,
                           ),
@@ -170,7 +170,7 @@ class _ReservationCalendarScreenState
                                     style: theme.textTheme.titleMedium,
                                   ),
                                   Text(
-                                    '~${(_calculateNights() * (center.priceMin + center.priceMax) / 2).toStringAsFixed(0)} TND',
+                                    '~${(_calculateNights() * center.price).toStringAsFixed(0)} TND',
                                     style: theme.textTheme.titleLarge?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: theme.colorScheme.primary,
