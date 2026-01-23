@@ -7,12 +7,16 @@ import '../../../core/network/api_exception.dart';
 class MarketplaceApiService {
   final Dio _dio = ApiClient().dio;
 
-  Future<List<Map<String, dynamic>>> getItems(
-      {String? centerId, String? category}) async {
+  Future<List<Map<String, dynamic>>> getItems({
+    String? centerId,
+    String? category,
+    String? search,
+  }) async {
     try {
       final queryParams = <String, dynamic>{};
       if (centerId != null) queryParams['centerId'] = centerId;
       if (category != null) queryParams['category'] = category;
+      if (search != null && search.isNotEmpty) queryParams['search'] = search;
 
       final response = await _dio.get(
         '${AppConfig.marketplacePath}/items',
@@ -134,6 +138,75 @@ class MarketplaceApiService {
     } on DioException catch (e) {
       if (e.error is ApiException) rethrow;
       throw ApiException('Failed to get orders: ${e.message}');
+    }
+  }
+
+  // Owner product management methods
+  Future<List<Map<String, dynamic>>> getOwnedItems() async {
+    try {
+      final response =
+          await _dio.get('${AppConfig.marketplacePath}/items/owned');
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return List<Map<String, dynamic>>.from(apiResponse['data']);
+      }
+      return [];
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to get owned items: ${e.message}');
+    }
+  }
+
+  Future<Map<String, dynamic>> createItem(Map<String, dynamic> itemData) async {
+    try {
+      final response = await _dio.post(
+        '${AppConfig.marketplacePath}/items',
+        data: itemData,
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return apiResponse['data'] as Map<String, dynamic>;
+      }
+      throw ApiException(apiResponse['message'] ?? 'Failed to create item');
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to create item: ${e.message}');
+    }
+  }
+
+  Future<Map<String, dynamic>> updateItem(
+      String id, Map<String, dynamic> itemData) async {
+    try {
+      final response = await _dio.put(
+        '${AppConfig.marketplacePath}/items/$id',
+        data: itemData,
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return apiResponse['data'] as Map<String, dynamic>;
+      }
+      throw ApiException(apiResponse['message'] ?? 'Failed to update item');
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to update item: ${e.message}');
+    }
+  }
+
+  Future<void> deleteItem(String id) async {
+    try {
+      final response =
+          await _dio.delete('${AppConfig.marketplacePath}/items/$id');
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] != true) {
+        throw ApiException(apiResponse['message'] ?? 'Failed to delete item');
+      }
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to delete item: ${e.message}');
     }
   }
 }

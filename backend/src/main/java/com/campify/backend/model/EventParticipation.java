@@ -1,5 +1,6 @@
 package com.campify.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,14 @@ public class EventParticipation {
     private Long eventId;
 
     @NotNull
+    @Column(name = "user_id")
     private Long userId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JsonIgnoreProperties({ "password", "resetCode", "resetCodeExpiration", "authorities", "accountNonExpired",
+            "accountNonLocked", "credentialsNonExpired", "enabled", "username" })
+    private User user;
 
     @Enumerated(EnumType.STRING)
     @NotNull

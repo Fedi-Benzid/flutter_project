@@ -134,7 +134,7 @@ class _OwnerCenterCard extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
-        onTap: () => context.push(AppRoutes.centerDetailPath(center.id)),
+        onTap: () => context.go(AppRoutes.centerDetailPath(center.id)),
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -211,7 +211,7 @@ class _OwnerCenterCard extends ConsumerWidget {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          '${center.priceMin.toInt()}-${center.priceMax.toInt()} TND/night',
+                          '${center.price.toInt()} TND/night',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.primary,
                             fontWeight: FontWeight.bold,
@@ -304,7 +304,13 @@ class _ReservationsTab extends ConsumerWidget {
     final reservationsAsync = ref.watch(ownerReservationsProvider);
 
     return reservationsAsync.when(
-      data: (reservations) {
+      data: (allReservations) {
+        // Filter out cancelled and declined reservations for owner view
+        final reservations = allReservations
+            .where((r) =>
+                r.status != ReservationStatus.cancelled &&
+                r.status != ReservationStatus.declined)
+            .toList();
         if (reservations.isEmpty) {
           return Center(
             child: Column(
@@ -360,7 +366,7 @@ class _ReservationManageCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Reservation #${reservation.id.substring(reservation.id.length - 6)}',
+                        'Reservation #${_safeIdSuffix(reservation.id)}',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -376,6 +382,58 @@ class _ReservationManageCard extends ConsumerWidget {
                 _StatusChip(status: reservation.status),
               ],
             ),
+            // Camper Details Section
+            if (reservation.userName != null ||
+                reservation.userEmail != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Camper Details',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    if (reservation.userName != null)
+                      Row(
+                        children: [
+                          const Icon(Icons.person, size: 16),
+                          const SizedBox(width: 8),
+                          Text(reservation.userName!),
+                        ],
+                      ),
+                    if (reservation.userEmail != null) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.email, size: 16),
+                          const SizedBox(width: 8),
+                          Text(reservation.userEmail!),
+                        ],
+                      ),
+                    ],
+                    if (reservation.userPhone != null) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.phone, size: 16),
+                          const SizedBox(width: 8),
+                          Text(reservation.userPhone!),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
             const Divider(height: 24),
             Row(
               children: [
@@ -427,6 +485,11 @@ class _ReservationManageCard extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _safeIdSuffix(String id) {
+    if (id.length <= 6) return id;
+    return id.substring(id.length - 6);
   }
 
   String _formatDate(DateTime date) {

@@ -40,6 +40,12 @@ class MockEventsRepository implements EventsRepository {
   }
 
   @override
+  Future<List<EventParticipation>> getMyParticipations() async {
+    // Mock implementation returns empty list
+    return [];
+  }
+
+  @override
   Future<EventParticipation> requestParticipation(String eventId) async {
     return _mockServer.requestParticipation(eventId);
   }

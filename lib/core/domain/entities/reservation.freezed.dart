@@ -26,6 +26,15 @@ mixin _$Reservation {
   /// ID of the user making the reservation
   String get userId => throw _privateConstructorUsedError;
 
+  /// Name of the camper (for owner view)
+  String? get userName => throw _privateConstructorUsedError;
+
+  /// Email of the camper (for owner view)
+  String? get userEmail => throw _privateConstructorUsedError;
+
+  /// Phone of the camper (for owner view)
+  String? get userPhone => throw _privateConstructorUsedError;
+
   /// ID of the camping center
   String get centerId => throw _privateConstructorUsedError;
 
@@ -74,6 +83,9 @@ abstract class $ReservationCopyWith<$Res> {
   $Res call(
       {String id,
       String userId,
+      String? userName,
+      String? userEmail,
+      String? userPhone,
       String centerId,
       DateTime startDate,
       DateTime endDate,
@@ -102,6 +114,9 @@ class _$ReservationCopyWithImpl<$Res, $Val extends Reservation>
   $Res call({
     Object? id = null,
     Object? userId = null,
+    Object? userName = freezed,
+    Object? userEmail = freezed,
+    Object? userPhone = freezed,
     Object? centerId = null,
     Object? startDate = null,
     Object? endDate = null,
@@ -123,6 +138,18 @@ class _$ReservationCopyWithImpl<$Res, $Val extends Reservation>
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as String,
+      userName: freezed == userName
+          ? _value.userName
+          : userName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      userEmail: freezed == userEmail
+          ? _value.userEmail
+          : userEmail // ignore: cast_nullable_to_non_nullable
+              as String?,
+      userPhone: freezed == userPhone
+          ? _value.userPhone
+          : userPhone // ignore: cast_nullable_to_non_nullable
+              as String?,
       centerId: null == centerId
           ? _value.centerId
           : centerId // ignore: cast_nullable_to_non_nullable
@@ -182,6 +209,9 @@ abstract class _$$ReservationImplCopyWith<$Res>
   $Res call(
       {String id,
       String userId,
+      String? userName,
+      String? userEmail,
+      String? userPhone,
       String centerId,
       DateTime startDate,
       DateTime endDate,
@@ -208,6 +238,9 @@ class __$$ReservationImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? userId = null,
+    Object? userName = freezed,
+    Object? userEmail = freezed,
+    Object? userPhone = freezed,
     Object? centerId = null,
     Object? startDate = null,
     Object? endDate = null,
@@ -229,6 +262,18 @@ class __$$ReservationImplCopyWithImpl<$Res>
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as String,
+      userName: freezed == userName
+          ? _value.userName
+          : userName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      userEmail: freezed == userEmail
+          ? _value.userEmail
+          : userEmail // ignore: cast_nullable_to_non_nullable
+              as String?,
+      userPhone: freezed == userPhone
+          ? _value.userPhone
+          : userPhone // ignore: cast_nullable_to_non_nullable
+              as String?,
       centerId: null == centerId
           ? _value.centerId
           : centerId // ignore: cast_nullable_to_non_nullable
@@ -283,6 +328,9 @@ class _$ReservationImpl implements _Reservation {
   const _$ReservationImpl(
       {required this.id,
       required this.userId,
+      this.userName,
+      this.userEmail,
+      this.userPhone,
       required this.centerId,
       required this.startDate,
       required this.endDate,
@@ -306,6 +354,18 @@ class _$ReservationImpl implements _Reservation {
   /// ID of the user making the reservation
   @override
   final String userId;
+
+  /// Name of the camper (for owner view)
+  @override
+  final String? userName;
+
+  /// Email of the camper (for owner view)
+  @override
+  final String? userEmail;
+
+  /// Phone of the camper (for owner view)
+  @override
+  final String? userPhone;
 
   /// ID of the camping center
   @override
@@ -363,7 +423,7 @@ class _$ReservationImpl implements _Reservation {
 
   @override
   String toString() {
-    return 'Reservation(id: $id, userId: $userId, centerId: $centerId, startDate: $startDate, endDate: $endDate, guestCount: $guestCount, items: $items, status: $status, basePrice: $basePrice, totalPrice: $totalPrice, notes: $notes, orderId: $orderId, createdAt: $createdAt)';
+    return 'Reservation(id: $id, userId: $userId, userName: $userName, userEmail: $userEmail, userPhone: $userPhone, centerId: $centerId, startDate: $startDate, endDate: $endDate, guestCount: $guestCount, items: $items, status: $status, basePrice: $basePrice, totalPrice: $totalPrice, notes: $notes, orderId: $orderId, createdAt: $createdAt)';
   }
 
   @override
@@ -373,6 +433,12 @@ class _$ReservationImpl implements _Reservation {
             other is _$ReservationImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.userName, userName) ||
+                other.userName == userName) &&
+            (identical(other.userEmail, userEmail) ||
+                other.userEmail == userEmail) &&
+            (identical(other.userPhone, userPhone) ||
+                other.userPhone == userPhone) &&
             (identical(other.centerId, centerId) ||
                 other.centerId == centerId) &&
             (identical(other.startDate, startDate) ||
@@ -398,6 +464,9 @@ class _$ReservationImpl implements _Reservation {
       runtimeType,
       id,
       userId,
+      userName,
+      userEmail,
+      userPhone,
       centerId,
       startDate,
       endDate,
@@ -428,6 +497,9 @@ abstract class _Reservation implements Reservation {
   const factory _Reservation(
       {required final String id,
       required final String userId,
+      final String? userName,
+      final String? userEmail,
+      final String? userPhone,
       required final String centerId,
       required final DateTime startDate,
       required final DateTime endDate,
@@ -451,6 +523,18 @@ abstract class _Reservation implements Reservation {
 
   /// ID of the user making the reservation
   String get userId;
+  @override
+
+  /// Name of the camper (for owner view)
+  String? get userName;
+  @override
+
+  /// Email of the camper (for owner view)
+  String? get userEmail;
+  @override
+
+  /// Phone of the camper (for owner view)
+  String? get userPhone;
   @override
 
   /// ID of the camping center

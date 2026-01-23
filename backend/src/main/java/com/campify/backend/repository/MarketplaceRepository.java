@@ -14,4 +14,6 @@ public interface MarketplaceRepository extends JpaRepository<MarketplaceItem, Lo
     List<MarketplaceItem> findByCategory(MarketplaceItem.ItemCategory category);
 
     List<MarketplaceItem> findByCenterIdAndCategory(Long centerId, MarketplaceItem.ItemCategory category);
+
+    List<MarketplaceItem> findByOwnerId(Long ownerId);
 }

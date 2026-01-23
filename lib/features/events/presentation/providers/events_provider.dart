@@ -41,6 +41,25 @@ final eventParticipationsProvider =
   return repository.getParticipations(eventId);
 });
 
+/// Provider for current user's participations across all events.
+final myParticipationsProvider =
+    FutureProvider<List<EventParticipation>>((ref) async {
+  final repository = ref.watch(eventsRepositoryProvider);
+  return repository.getMyParticipations();
+});
+
+/// Provider for current user's participation for a specific event.
+/// Returns null if the user has not requested to participate.
+final myParticipationForEventProvider =
+    FutureProvider.family<EventParticipation?, String>((ref, eventId) async {
+  final participations = await ref.watch(myParticipationsProvider.future);
+  try {
+    return participations.firstWhere((p) => p.eventId == eventId);
+  } catch (_) {
+    return null;
+  }
+});
+
 /// Notifier for managing event operations.
 class EventsNotifier extends StateNotifier<AsyncValue<void>> {
   final EventsRepository _repository;
@@ -96,6 +115,7 @@ class EventsNotifier extends StateNotifier<AsyncValue<void>> {
       state = const AsyncValue.data(null);
       _ref.invalidate(eventParticipationsProvider(eventId));
       _ref.invalidate(eventByIdProvider(eventId));
+      _ref.invalidate(myParticipationsProvider);
       return participation;
     } catch (e, st) {
       state = AsyncValue.error(e, st);

@@ -41,11 +41,8 @@ class CampingCenter with _$CampingCenter {
     /// See CenterTags in constants.dart for available options
     @Default([]) List<String> tags,
 
-    /// Minimum price per night
-    @Default(0) double priceMin,
-
-    /// Maximum price per night
-    @Default(0) double priceMax,
+    /// Price per night in TND
+    @Default(0) double price,
 
     /// Whether this center is featured/interesting
     /// Used for discovery and recommendations

@@ -24,15 +24,27 @@ public class MarketplaceService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
 
-    public List<MarketplaceItem> getAllItems(Long centerId, MarketplaceItem.ItemCategory category) {
+    public List<MarketplaceItem> getAllItems(Long centerId, MarketplaceItem.ItemCategory category, String search) {
+        List<MarketplaceItem> items;
         if (centerId != null && category != null) {
-            return marketplaceRepository.findByCenterIdAndCategory(centerId, category);
+            items = marketplaceRepository.findByCenterIdAndCategory(centerId, category);
         } else if (centerId != null) {
-            return marketplaceRepository.findByCenterId(centerId);
+            items = marketplaceRepository.findByCenterId(centerId);
         } else if (category != null) {
-            return marketplaceRepository.findByCategory(category);
+            items = marketplaceRepository.findByCategory(category);
+        } else {
+            items = marketplaceRepository.findAll();
         }
-        return marketplaceRepository.findAll();
+
+        // Apply search filter if provided
+        if (search != null && !search.isEmpty()) {
+            items = items.stream()
+                    .filter(item -> item.getName().toLowerCase().contains(search.toLowerCase()) ||
+                            (item.getDescription() != null &&
+                                    item.getDescription().toLowerCase().contains(search.toLowerCase())))
+                    .toList();
+        }
+        return items;
     }
 
     public MarketplaceItem getItemById(Long id) {
@@ -155,5 +167,53 @@ public class MarketplaceService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"))
                 .getId();
+    }
+
+    // Owner product management methods
+    @Transactional
+    public MarketplaceItem createItem(MarketplaceItem item, String email) {
+        Long userId = getUserIdFromEmail(email);
+        item.setOwnerId(userId);
+        return marketplaceRepository.save(item);
+    }
+
+    @Transactional
+    public MarketplaceItem updateItem(Long id, MarketplaceItem item, String email) {
+        Long userId = getUserIdFromEmail(email);
+        MarketplaceItem existingItem = marketplaceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Marketplace item not found"));
+
+        // Verify ownership
+        if (!existingItem.getOwnerId().equals(userId)) {
+            throw new RuntimeException("You can only update your own items");
+        }
+
+        existingItem.setName(item.getName());
+        existingItem.setDescription(item.getDescription());
+        existingItem.setPrice(item.getPrice());
+        existingItem.setCategory(item.getCategory());
+        existingItem.setStock(item.getStock());
+        existingItem.setImageUrls(item.getImageUrls());
+
+        return marketplaceRepository.save(existingItem);
+    }
+
+    @Transactional
+    public void deleteItem(Long id, String email) {
+        Long userId = getUserIdFromEmail(email);
+        MarketplaceItem existingItem = marketplaceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Marketplace item not found"));
+
+        // Verify ownership
+        if (!existingItem.getOwnerId().equals(userId)) {
+            throw new RuntimeException("You can only delete your own items");
+        }
+
+        marketplaceRepository.delete(existingItem);
+    }
+
+    public List<MarketplaceItem> getOwnedItems(String email) {
+        Long userId = getUserIdFromEmail(email);
+        return marketplaceRepository.findByOwnerId(userId);
     }
 }

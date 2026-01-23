@@ -40,7 +40,24 @@ class ApiReservationsRepository implements ReservationsRepository {
 
   @override
   Future<Reservation> updateStatus(String id, ReservationStatus status) async {
-    throw UnimplementedError('Update status not yet implemented');
+    final statusStr = _statusToBackend(status);
+    final data = await _apiService.updateStatus(id, statusStr);
+    return _transformReservation(data);
+  }
+
+  String _statusToBackend(ReservationStatus status) {
+    switch (status) {
+      case ReservationStatus.approved:
+        return 'CONFIRMED';
+      case ReservationStatus.declined:
+        return 'CANCELLED';
+      case ReservationStatus.cancelled:
+        return 'CANCELLED';
+      case ReservationStatus.completed:
+        return 'COMPLETED';
+      case ReservationStatus.pending:
+        return 'PENDING';
+    }
   }
 
   @override
@@ -49,6 +66,7 @@ class ApiReservationsRepository implements ReservationsRepository {
   }
 
   Reservation _transformReservation(Map<String, dynamic> json) {
+    final userJson = json['user'] as Map<String, dynamic>?;
     final centerJson = json['center'] as Map<String, dynamic>?;
     final checkIn = json['checkInDate'] as String?;
     final checkOut = json['checkOutDate'] as String?;
@@ -56,7 +74,10 @@ class ApiReservationsRepository implements ReservationsRepository {
 
     return Reservation(
       id: json['id'].toString(),
-      userId: (json['user'] as Map<String, dynamic>?)?['id']?.toString() ?? '',
+      userId: userJson?['id']?.toString() ?? '',
+      userName: userJson?['name'] as String?,
+      userEmail: userJson?['email'] as String?,
+      userPhone: userJson?['phone'] as String?,
       centerId: centerJson?['id']?.toString() ?? '',
       startDate: checkIn != null ? DateTime.parse(checkIn) : DateTime.now(),
       endDate: checkOut != null ? DateTime.parse(checkOut) : DateTime.now(),

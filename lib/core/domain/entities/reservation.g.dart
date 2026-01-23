@@ -10,6 +10,9 @@ _$ReservationImpl _$$ReservationImplFromJson(Map<String, dynamic> json) =>
     _$ReservationImpl(
       id: json['id'] as String,
       userId: json['userId'] as String,
+      userName: json['userName'] as String?,
+      userEmail: json['userEmail'] as String?,
+      userPhone: json['userPhone'] as String?,
       centerId: json['centerId'] as String,
       startDate: DateTime.parse(json['startDate'] as String),
       endDate: DateTime.parse(json['endDate'] as String),
@@ -33,6 +36,9 @@ Map<String, dynamic> _$$ReservationImplToJson(_$ReservationImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,
+      'userName': instance.userName,
+      'userEmail': instance.userEmail,
+      'userPhone': instance.userPhone,
       'centerId': instance.centerId,
       'startDate': instance.startDate.toIso8601String(),
       'endDate': instance.endDate.toIso8601String(),

@@ -5,95 +5,142 @@ import 'package:go_router/go_router.dart';
 import '../../config/router.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 
-/// App shell with bottom navigation for main screens.
-class AppShell extends ConsumerStatefulWidget {
+/// Application shell with bottom navigation bar.
+class AppShell extends ConsumerWidget {
   final Widget child;
 
   const AppShell({super.key, required this.child});
 
   @override
-  ConsumerState<AppShell> createState() => _AppShellState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+      body: child,
+      bottomNavigationBar: _BottomNavBar(),
+    );
+  }
 }
 
-class _AppShellState extends ConsumerState<AppShell> {
-  final int _currentIndex = 0;
-
+class _BottomNavBar extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final location = GoRouterState.of(context).matchedLocation;
     final isOwner = ref.watch(isOwnerProvider);
 
-    return Scaffold(
-      body: widget.child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _calculateSelectedIndex(context),
-        onDestinationSelected: (index) => _onItemTapped(index, context),
-        destinations: [
-          const NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.shopping_bag_outlined),
-            selectedIcon: Icon(Icons.shopping_bag),
-            label: 'Marketplace',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.event_outlined),
-            selectedIcon: Icon(Icons.event),
-            label: 'Events',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.calendar_today_outlined),
-            selectedIcon: Icon(Icons.calendar_today),
-            label: 'Reservations',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
+    if (isOwner) {
+      return _buildOwnerNav(context, location);
+    } else {
+      return _buildCamperNav(context, location);
+    }
+  }
+
+  Widget _buildOwnerNav(BuildContext context, String location) {
+    int getCurrentIndex() {
+      if (location.startsWith('/owner')) return 1;
+      if (location.startsWith('/events')) return 2;
+      if (location.startsWith('/profile')) return 3;
+      return 0; // Home
+    }
+
+    return NavigationBar(
+      selectedIndex: getCurrentIndex(),
+      onDestinationSelected: (index) {
+        switch (index) {
+          case 0:
+            context.go(AppRoutes.home);
+            break;
+          case 1:
+            context.go(AppRoutes.ownerDashboard);
+            break;
+          case 2:
+            context.go(AppRoutes.events);
+            break;
+          case 3:
+            context.go(AppRoutes.profile);
+            break;
+        }
+      },
+      destinations: const [
+        NavigationDestination(
+          icon: Icon(Icons.explore_outlined),
+          selectedIcon: Icon(Icons.explore),
+          label: 'Explore',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.dashboard_outlined),
+          selectedIcon: Icon(Icons.dashboard),
+          label: 'Dashboard',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.event_outlined),
+          selectedIcon: Icon(Icons.event),
+          label: 'Events',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.person_outline),
+          selectedIcon: Icon(Icons.person),
+          label: 'Profile',
+        ),
+      ],
     );
   }
 
-  int _calculateSelectedIndex(BuildContext context) {
-    final String location = GoRouterState.of(context).uri.path;
+  Widget _buildCamperNav(BuildContext context, String location) {
+    int getCurrentIndex() {
+      if (location.startsWith('/marketplace')) return 1;
+      if (location.startsWith('/events')) return 2;
+      if (location.startsWith('/reservations')) return 3;
+      if (location.startsWith('/profile')) return 4;
+      return 0; // Home
+    }
 
-    if (location.startsWith('/marketplace') || location.startsWith('/items')) {
-      return 1;
-    }
-    if (location.startsWith('/events')) {
-      return 2;
-    }
-    if (location.startsWith('/reservations')) {
-      return 3;
-    }
-    if (location.startsWith('/profile')) {
-      return 4;
-    }
-    return 0;
-  }
-
-  void _onItemTapped(int index, BuildContext context) {
-    switch (index) {
-      case 0:
-        context.go(AppRoutes.home);
-        break;
-      case 1:
-        context.go(AppRoutes.marketplace);
-        break;
-      case 2:
-        context.go(AppRoutes.events);
-        break;
-      case 3:
-        context.go(AppRoutes.reservations);
-        break;
-      case 4:
-        context.go(AppRoutes.profile);
-        break;
-    }
+    return NavigationBar(
+      selectedIndex: getCurrentIndex(),
+      onDestinationSelected: (index) {
+        switch (index) {
+          case 0:
+            context.go(AppRoutes.home);
+            break;
+          case 1:
+            context.go(AppRoutes.marketplace);
+            break;
+          case 2:
+            context.go(AppRoutes.events);
+            break;
+          case 3:
+            context.go(AppRoutes.reservations);
+            break;
+          case 4:
+            context.go(AppRoutes.profile);
+            break;
+        }
+      },
+      destinations: const [
+        NavigationDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home),
+          label: 'Home',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.shopping_bag_outlined),
+          selectedIcon: Icon(Icons.shopping_bag),
+          label: 'Shop',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.event_outlined),
+          selectedIcon: Icon(Icons.event),
+          label: 'Events',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.calendar_today_outlined),
+          selectedIcon: Icon(Icons.calendar_today),
+          label: 'Bookings',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.person_outline),
+          selectedIcon: Icon(Icons.person),
+          label: 'Profile',
+        ),
+      ],
+    );
   }
 }

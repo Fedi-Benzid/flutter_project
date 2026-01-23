@@ -158,4 +158,29 @@ class ApiMarketplaceRepository implements MarketplaceRepository {
         return PaymentStatus.pending;
     }
   }
+
+  // Owner product management methods
+  @override
+  Future<List<MarketplaceItem>> getOwnedItems() async {
+    final data = await _apiService.getOwnedItems();
+    return data.map((json) => _transformItem(json)).toList();
+  }
+
+  @override
+  Future<MarketplaceItem> createItem(Map<String, dynamic> itemData) async {
+    final data = await _apiService.createItem(itemData);
+    return _transformItem(data);
+  }
+
+  @override
+  Future<MarketplaceItem> updateItem(
+      String id, Map<String, dynamic> itemData) async {
+    final data = await _apiService.updateItem(id, itemData);
+    return _transformItem(data);
+  }
+
+  @override
+  Future<void> deleteItem(String id) async {
+    await _apiService.deleteItem(id);
+  }
 }

@@ -58,10 +58,41 @@ class ReservationsApiService {
       if (apiResponse['success'] == true && apiResponse['data'] != null) {
         return apiResponse['data'] as Map<String, dynamic>;
       }
-      throw ApiException(
-          apiResponse['message'] ?? 'Failed to create reservation');
+
+      // Handle validation errors - extract field messages from data
+      String errorMessage =
+          apiResponse['message'] ?? 'Failed to create reservation';
+      final errorData = apiResponse['data'];
+      if (errorData != null && errorData is Map<String, dynamic>) {
+        final fieldErrors =
+            errorData.entries.map((e) => '${e.key}: ${e.value}').join('\n');
+        if (fieldErrors.isNotEmpty) {
+          errorMessage = fieldErrors;
+        }
+      }
+
+      throw ApiException(errorMessage);
     } on DioException catch (e) {
       if (e.error is ApiException) rethrow;
+
+      // Handle HTTP error responses with validation data
+      final responseData = e.response?.data;
+      if (responseData != null && responseData is Map<String, dynamic>) {
+        String errorMessage =
+            responseData['message'] ?? 'Failed to create reservation';
+        final errorDataFromResponse = responseData['data'];
+        if (errorDataFromResponse != null &&
+            errorDataFromResponse is Map<String, dynamic>) {
+          final fieldErrors = errorDataFromResponse.entries
+              .map((e) => '${e.key}: ${e.value}')
+              .join('\n');
+          if (fieldErrors.isNotEmpty) {
+            errorMessage = fieldErrors;
+          }
+        }
+        throw ApiException(errorMessage);
+      }
+
       throw ApiException('Failed to create reservation: ${e.message}');
     }
   }
@@ -87,6 +118,24 @@ class ReservationsApiService {
     } on DioException catch (e) {
       if (e.error is ApiException) rethrow;
       throw ApiException('Failed to get owner reservations: ${e.message}');
+    }
+  }
+
+  Future<Map<String, dynamic>> updateStatus(String id, String status) async {
+    try {
+      final response = await _dio.put(
+        '${AppConfig.reservationsPath}/$id/status',
+        data: {'status': status},
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return apiResponse['data'] as Map<String, dynamic>;
+      }
+      throw ApiException(apiResponse['message'] ?? 'Failed to update status');
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to update reservation status: ${e.message}');
     }
   }
 }

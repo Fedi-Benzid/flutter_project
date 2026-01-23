@@ -7,12 +7,10 @@ import com.campify.backend.service.CampingCenterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,8 +22,14 @@ public class CampingCenterController {
     private final CampingCenterService campingCenterService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CampingCenter>>> getAllCenters() {
-        List<CampingCenter> centers = campingCenterService.getAllCenters();
+    public ResponseEntity<ApiResponse<List<CampingCenter>>> getAllCenters(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) List<String> tags) {
+        List<CampingCenter> centers = campingCenterService.getCentersFiltered(
+                name, location, minPrice, maxPrice, tags);
         return ResponseEntity.ok(new ApiResponse<>(true, "Centers fetched successfully", centers));
     }
 
@@ -42,26 +46,21 @@ public class CampingCenterController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Center fetched successfully", center));
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<CampingCenter>> createCenter(
-            @RequestParam("name") String name,
-            @RequestParam("description") String description,
-            @RequestParam("location") String location,
-            @RequestParam("price") String price,
-            @RequestParam(value = "images", required = false) List<MultipartFile> images) {
-
+    @PostMapping
+    public ResponseEntity<ApiResponse<CampingCenter>> createCenter(@Valid @RequestBody CampingCenter center) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        CampingCenter center = CampingCenter.builder()
-                .name(name)
-                .description(description)
-                .location(location)
-                .price(price)
-                .build();
-
-        CampingCenter createdCenter = campingCenterService.createCenter(center, images, auth.getName());
+        CampingCenter createdCenter = campingCenterService.createCenter(center, null, auth.getName());
         return new ResponseEntity<>(new ApiResponse<>(true, "Center created successfully", createdCenter),
                 HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<CampingCenter>> updateCenter(
+            @PathVariable Long id,
+            @Valid @RequestBody CampingCenter center) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        CampingCenter updatedCenter = campingCenterService.updateCenter(id, center, auth.getName());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Center updated successfully", updatedCenter));
     }
 
     @DeleteMapping("/{id}")

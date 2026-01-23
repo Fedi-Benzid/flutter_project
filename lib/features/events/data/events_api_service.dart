@@ -52,9 +52,97 @@ class EventsApiService {
     }
   }
 
+  Future<Map<String, dynamic>> createEvent(
+      Map<String, dynamic> eventData) async {
+    try {
+      final response = await _dio.post(
+        AppConfig.eventsPath,
+        data: eventData,
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return apiResponse['data'] as Map<String, dynamic>;
+      }
+      throw ApiException(apiResponse['message'] ?? 'Failed to create event');
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to create event: ${e.message}');
+    }
+  }
+
+  Future<Map<String, dynamic>> updateEvent(
+      String id, Map<String, dynamic> eventData) async {
+    try {
+      final response = await _dio.put(
+        '${AppConfig.eventsPath}/$id',
+        data: eventData,
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return apiResponse['data'] as Map<String, dynamic>;
+      }
+      throw ApiException(apiResponse['message'] ?? 'Failed to update event');
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to update event: ${e.message}');
+    }
+  }
+
+  Future<void> deleteEvent(String id) async {
+    try {
+      final response = await _dio.delete('${AppConfig.eventsPath}/$id');
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] != true) {
+        throw ApiException(apiResponse['message'] ?? 'Failed to delete event');
+      }
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to delete event: ${e.message}');
+    }
+  }
+
   Future<void> leaveEvent(String eventId) async {
     // API doesn't have leave endpoint, would need to add
     throw UnimplementedError('Leave event not yet implemented');
+  }
+
+  Future<List<Map<String, dynamic>>> getEventParticipations(
+      String eventId) async {
+    try {
+      final response =
+          await _dio.get('${AppConfig.eventsPath}/$eventId/participations');
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return List<Map<String, dynamic>>.from(apiResponse['data']);
+      }
+      return [];
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to get participations: ${e.message}');
+    }
+  }
+
+  Future<Map<String, dynamic>> updateParticipationStatus(
+      String eventId, String participationId, String status) async {
+    try {
+      final response = await _dio.put(
+        '${AppConfig.eventsPath}/$eventId/participations/$participationId',
+        data: {'status': status},
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return apiResponse['data'] as Map<String, dynamic>;
+      }
+      throw ApiException(apiResponse['message'] ?? 'Failed to update status');
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to update participation status: ${e.message}');
+    }
   }
 
   Future<List<Map<String, dynamic>>> getUserParticipations() async {

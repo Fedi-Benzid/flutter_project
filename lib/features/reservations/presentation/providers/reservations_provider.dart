@@ -17,7 +17,9 @@ final userReservationsProvider = FutureProvider<List<Reservation>>((ref) async {
 });
 
 /// Provider for owner's center reservations.
-final ownerReservationsProvider = FutureProvider<List<Reservation>>((
+/// Using autoDispose to refresh data when navigating back to the screen.
+final ownerReservationsProvider =
+    FutureProvider.autoDispose<List<Reservation>>((
   ref,
 ) async {
   final repository = ref.watch(reservationsRepositoryProvider);

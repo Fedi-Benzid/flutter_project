@@ -29,7 +29,7 @@ extension ParticipationStatusExtension on ParticipationStatus {
 
 /// Event entity for forum/community events.
 ///
-/// Events allow owners to organize camping activities at their centers.
+/// Events allow owners and campers to organize camping activities.
 @freezed
 class Event with _$Event {
   const factory Event({
@@ -45,8 +45,11 @@ class Event with _$Event {
     /// Detailed description of the event
     required String description,
 
-    /// Date and time of the event
+    /// Date and time of the event start
     required DateTime date,
+
+    /// End date and time of the event
+    DateTime? endDate,
 
     /// Duration in hours
     @Default(2) int durationHours,
@@ -59,6 +62,21 @@ class Event with _$Event {
 
     /// Optional image URL for the event
     String? imageUrl,
+
+    /// Location of the event
+    String? location,
+
+    /// Price per person
+    @Default(0) double price,
+
+    /// Activities included in the event
+    @Default([]) List<String> activities,
+
+    /// ID of the event creator
+    String? creatorId,
+
+    /// Phone number of the event creator
+    String? creatorPhone,
 
     /// When the event was created
     DateTime? createdAt,
@@ -88,6 +106,15 @@ class EventParticipation with _$EventParticipation {
 
     /// Optional message from the requester
     String? message,
+
+    /// Phone number of the requester
+    String? phoneNumber,
+
+    /// Number of persons (including family/friends)
+    @Default(1) int numberOfPersons,
+
+    /// Additional comments
+    String? comments,
 
     /// When the request was made
     DateTime? requestedAt,

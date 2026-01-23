@@ -51,7 +51,9 @@ final centerReviewsProvider = FutureProvider.family<List<Review>, String>((
 });
 
 /// Provider for centers owned by the current user.
-final ownedCentersProvider = FutureProvider<List<CampingCenter>>((ref) async {
+/// Using autoDispose to refresh data when navigating back to the screen.
+final ownedCentersProvider =
+    FutureProvider.autoDispose<List<CampingCenter>>((ref) async {
   final repository = ref.watch(centersRepositoryProvider);
   return repository.getOwnedCenters();
 });
@@ -129,9 +131,10 @@ class CentersNotifier extends StateNotifier<AsyncValue<void>> {
     try {
       final created = await _repository.createCenter(center);
       state = const AsyncValue.data(null);
-      // Invalidate providers to refresh data
+      // Invalidate all providers to refresh data everywhere
       _ref.invalidate(ownedCentersProvider);
       _ref.invalidate(filteredCentersProvider);
+      _ref.invalidate(featuredCentersProvider);
       return created;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -176,6 +179,20 @@ class CentersNotifier extends StateNotifier<AsyncValue<void>> {
       _ref.invalidate(centerReviewsProvider(review.centerId));
       _ref.invalidate(centerByIdProvider(review.centerId));
       return created;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return null;
+    }
+  }
+
+  Future<Review?> updateReview(String id, Review review) async {
+    state = const AsyncValue.loading();
+    try {
+      final updated = await _repository.updateReview(id, review);
+      state = const AsyncValue.data(null);
+      _ref.invalidate(centerReviewsProvider(review.centerId));
+      _ref.invalidate(centerByIdProvider(review.centerId));
+      return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       return null;

@@ -186,7 +186,7 @@ class CenterCard extends StatelessWidget {
                         ),
                       // Price
                       Text(
-                        '${center.priceMin.toInt()}-${center.priceMax.toInt()} TND/night',
+                        '${center.price.toInt()} TND/night',
                         style: theme.textTheme.titleSmall?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.bold,
