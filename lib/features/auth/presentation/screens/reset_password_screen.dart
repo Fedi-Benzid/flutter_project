@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
+import '../../domain/auth_state.dart';
 import '../../../../config/router.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
@@ -49,6 +50,24 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    // Listen to error state
+    ref.listen<AuthState>(authStateProvider, (previous, next) {
+      next.maybeWhen(
+        error: (message) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: theme.colorScheme.error,
+            ),
+          );
+          ref.read(authStateProvider.notifier).clearError();
+        },
+        orElse: () {},
+      );
+    });
+
     return Scaffold(
       appBar: AppBar(title: const Text('Reset Password')),
       body: Padding(

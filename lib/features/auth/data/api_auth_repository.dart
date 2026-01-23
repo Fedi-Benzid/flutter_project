@@ -47,6 +47,7 @@ class ApiAuthRepository implements AuthRepository {
     required String password,
     required String name,
     required UserRole role,
+    String? phone,
   }) async {
     try {
       // Register the user
@@ -55,6 +56,7 @@ class ApiAuthRepository implements AuthRepository {
         password: password,
         name: name,
         role: role,
+        phone: phone,
       );
 
       // Auto-login after registration

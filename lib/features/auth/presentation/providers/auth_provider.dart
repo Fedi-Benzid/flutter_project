@@ -82,6 +82,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String password,
     required String name,
     required UserRole role,
+    String? phone,
   }) async {
     state = const AuthState.loading();
 
@@ -91,6 +92,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         password: password,
         name: name,
         role: role,
+        phone: phone,
       );
       state = AuthState.authenticated(result.user);
       return true;

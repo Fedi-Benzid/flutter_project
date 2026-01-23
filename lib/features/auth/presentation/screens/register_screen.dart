@@ -124,9 +124,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         prefixIcon: const Icon(Icons.lock_outlined),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
+                            _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                           ),
                           onPressed: () {
                             setState(() {
@@ -153,14 +151,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         prefixIcon: const Icon(Icons.lock_outlined),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscureConfirmPassword
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
+                            _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                           ),
                           onPressed: () {
                             setState(() {
-                              _obscureConfirmPassword =
-                                  !_obscureConfirmPassword;
+                              _obscureConfirmPassword = !_obscureConfirmPassword;
                             });
                           },
                         ),
@@ -168,13 +163,25 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       obscureText: _obscureConfirmPassword,
                       textInputAction: TextInputAction.next,
                       validator: (value) {
-                        final password =
-                            _formKey.currentState?.fields['password']?.value;
+                        final password = _formKey.currentState?.fields['password']?.value;
                         if (value != password) {
                           return 'Passwords do not match';
                         }
                         return null;
                       },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Phone number field (optional)
+                    FormBuilderTextField(
+                      name: 'phone',
+                      decoration: const InputDecoration(
+                        labelText: 'Phone Number (Optional)',
+                        prefixIcon: Icon(Icons.phone_outlined),
+                        hintText: 'Enter your phone number',
+                      ),
+                      keyboardType: TextInputType.phone,
+                      textInputAction: TextInputAction.next,
                     ),
                     const SizedBox(height: 24),
 
@@ -191,8 +198,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             _RoleCard(
                               icon: Icons.hiking,
                               title: 'Book Camping Trips',
-                              subtitle:
-                                  'Find and reserve amazing camping spots',
+                              subtitle: 'Find and reserve amazing camping spots',
                               isSelected: field.value == UserRole.camper,
                               onTap: () => field.didChange(UserRole.camper),
                             ),
@@ -200,8 +206,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             _RoleCard(
                               icon: Icons.business,
                               title: 'Manage a Camping Center',
-                              subtitle:
-                                  'List your campground and manage bookings',
+                              subtitle: 'List your campground and manage bookings',
                               isSelected: field.value == UserRole.owner,
                               onTap: () => field.didChange(UserRole.owner),
                             ),
@@ -253,13 +258,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       setState(() => _isLoading = true);
 
       final values = _formKey.currentState!.value;
-      await ref
-          .read(authStateProvider.notifier)
-          .register(
+      final phone = values['phone'] as String?;
+      await ref.read(authStateProvider.notifier).register(
             email: values['email'] as String,
             password: values['password'] as String,
             name: values['name'] as String,
             role: values['role'] as UserRole,
+            phone: phone?.isNotEmpty == true ? phone : null,
           );
     }
   }
@@ -292,30 +297,22 @@ class _RoleCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected
-                ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withOpacity(0.3),
+            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline.withOpacity(0.3),
             width: isSelected ? 2 : 1,
           ),
-          color: isSelected
-              ? theme.colorScheme.primaryContainer.withOpacity(0.3)
-              : null,
+          color: isSelected ? theme.colorScheme.primaryContainer.withOpacity(0.3) : null,
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isSelected
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.surfaceContainerHighest,
+                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: isSelected
-                    ? theme.colorScheme.onPrimary
-                    : theme.colorScheme.onSurfaceVariant,
+                color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(width: 16),
@@ -338,8 +335,7 @@ class _RoleCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (isSelected)
-              Icon(Icons.check_circle, color: theme.colorScheme.primary),
+            if (isSelected) Icon(Icons.check_circle, color: theme.colorScheme.primary),
           ],
         ),
       ),

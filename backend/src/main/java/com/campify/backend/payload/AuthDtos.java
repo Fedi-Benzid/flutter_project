@@ -34,6 +34,7 @@ public class AuthDtos {
         @NotBlank
         private String password;
         private User.Role role; // Optional, default to USER if null
+        private String phoneNumber; // Optional phone number
     }
 
     @Data
