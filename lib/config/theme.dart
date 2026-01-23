@@ -1,4 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+/// Provider to manage the app's theme mode (light/dark/system)
+final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
+  return ThemeModeNotifier();
+});
+
+/// StateNotifier for managing theme mode
+class ThemeModeNotifier extends StateNotifier<ThemeMode> {
+  ThemeModeNotifier() : super(ThemeMode.light);
+
+  /// Toggle between light and dark mode
+  void toggleTheme() {
+    if (state == ThemeMode.dark) {
+      state = ThemeMode.light;
+    } else {
+      state = ThemeMode.dark;
+    }
+  }
+
+  /// Set a specific theme mode
+  void setThemeMode(ThemeMode mode) {
+    state = mode;
+  }
+
+  /// Check if current mode is dark
+  bool get isDarkMode => state == ThemeMode.dark;
+}
 
 /// Material 3 theme configuration for Campify Manager.
 ///

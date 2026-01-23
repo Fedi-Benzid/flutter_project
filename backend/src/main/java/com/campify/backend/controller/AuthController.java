@@ -71,6 +71,7 @@ public class AuthController {
                                 .email(registerRequest.getEmail())
                                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                                 .role(registerRequest.getRole() != null ? registerRequest.getRole() : User.Role.USER)
+                                .phoneNumber(registerRequest.getPhoneNumber())
                                 .build();
 
                 userRepository.save(user);
@@ -161,11 +162,12 @@ public class AuthController {
                         userRepository.save(user);
 
                         emailService.sendResetCode(user.getEmail(), code);
+                        return ResponseEntity.ok(new ApiResponse<>(true,
+                                        "A 4-digit code has been sent to your email"));
                 }
 
-                // Always return success to not reveal if email exists
-                return ResponseEntity.ok(new ApiResponse<>(true,
-                                "If the email exists, a 4-digit code has been sent to your email"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(new ApiResponse<>(false, "No account found with this email address"));
         }
 
         @PostMapping("/verify-reset-code")

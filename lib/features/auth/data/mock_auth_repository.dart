@@ -48,6 +48,7 @@ class MockAuthRepository implements AuthRepository {
     required String password,
     required String name,
     required UserRole role,
+    String? phone,
   }) async {
     try {
       final result = await _mockServer.register(

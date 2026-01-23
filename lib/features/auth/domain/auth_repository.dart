@@ -27,6 +27,7 @@ abstract class AuthRepository {
     required String password,
     required String name,
     required UserRole role,
+    String? phone,
   });
 
   /// Logout the current user.

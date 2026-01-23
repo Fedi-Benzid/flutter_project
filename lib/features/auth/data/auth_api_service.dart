@@ -49,6 +49,7 @@ class AuthApiService {
     required String password,
     required String name,
     required UserRole role,
+    String? phone,
   }) async {
     try {
       // Split name into firstName and lastName
@@ -56,15 +57,22 @@ class AuthApiService {
       final firstName = nameParts.first;
       final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
 
+      final data = <String, dynamic>{
+        'email': email,
+        'password': password,
+        'firstName': firstName,
+        'lastName': lastName,
+        'role': role == UserRole.owner ? 'OWNER' : 'USER',
+      };
+
+      // Add phone number if provided
+      if (phone != null && phone.isNotEmpty) {
+        data['phoneNumber'] = phone;
+      }
+
       final response = await _dio.post(
         '${AppConfig.authPath}/register',
-        data: {
-          'email': email,
-          'password': password,
-          'firstName': firstName,
-          'lastName': lastName,
-          'role': role == UserRole.owner ? 'OWNER' : 'USER',
-        },
+        data: data,
       );
 
       final apiResponse = response.data as Map<String, dynamic>;
@@ -170,10 +178,16 @@ class AuthApiService {
         data: {'email': email},
       );
     } on DioException catch (e) {
-      if (e.error is ApiException) {
-        rethrow;
+      if (e.response?.data != null) {
+        try {
+          final errorData = e.response!.data as Map<String, dynamic>;
+          final message = errorData['message'] as String?;
+          if (message != null && message.isNotEmpty) {
+            throw ApiException(message);
+          }
+        } catch (_) {}
       }
-      throw ApiException('Failed to request reset code: ${e.message}');
+      throw ApiException('Failed to request reset code');
     }
   }
 
@@ -192,10 +206,16 @@ class AuthApiService {
         throw ApiException(apiResponse['message'] ?? 'Invalid code');
       }
     } on DioException catch (e) {
-      if (e.error is ApiException) {
-        rethrow;
+      if (e.response?.data != null) {
+        try {
+          final errorData = e.response!.data as Map<String, dynamic>;
+          final message = errorData['message'] as String?;
+          if (message != null && message.isNotEmpty) {
+            throw ApiException(message);
+          }
+        } catch (_) {}
       }
-      throw ApiException('Failed to verify code: ${e.message}');
+      throw ApiException('Failed to verify code');
     }
   }
 
@@ -219,10 +239,16 @@ class AuthApiService {
         throw ApiException(apiResponse['message'] ?? 'Failed to reset password');
       }
     } on DioException catch (e) {
-      if (e.error is ApiException) {
-        rethrow;
+      if (e.response?.data != null) {
+        try {
+          final errorData = e.response!.data as Map<String, dynamic>;
+          final message = errorData['message'] as String?;
+          if (message != null && message.isNotEmpty) {
+            throw ApiException(message);
+          }
+        } catch (_) {}
       }
-      throw ApiException('Failed to reset password: ${e.message}');
+      throw ApiException('Failed to reset password');
     }
   }
 
@@ -252,7 +278,26 @@ class AuthApiService {
       if (e.error is ApiException) {
         rethrow;
       }
-      throw ApiException('Failed to change password: ${e.message}');
+      // Try to extract error message from response
+      if (e.response?.data != null) {
+        try {
+          final errorData = e.response!.data as Map<String, dynamic>;
+          final message = errorData['message'] as String?;
+          if (message != null && message.isNotEmpty) {
+            throw ApiException(message);
+          }
+        } catch (_) {
+          // Ignore parsing errors and use default message
+        }
+      }
+      // Provide user-friendly error messages
+      if (e.response?.statusCode == 400) {
+        throw ApiException('Invalid current password');
+      } else if (e.response?.statusCode == 401) {
+        throw ApiException('Session expired. Please login again.');
+      } else {
+        throw ApiException('Failed to change password. Please try again.');
+      }
     }
   }
 
