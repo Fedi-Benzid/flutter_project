@@ -30,6 +30,12 @@ class MockEventsRepository implements EventsRepository {
   }
 
   @override
+  Future<Event> closeEvent(String id) async {
+    // Mock: just return the event as-is
+    return _mockServer.getEvent(id);
+  }
+
+  @override
   Future<void> deleteEvent(String id) async {
     await _mockServer.deleteEvent(id);
   }
@@ -46,7 +52,7 @@ class MockEventsRepository implements EventsRepository {
   }
 
   @override
-  Future<EventParticipation> requestParticipation(String eventId) async {
+  Future<EventParticipation> requestParticipation(String eventId, {int numberOfPersons = 1}) async {
     return _mockServer.requestParticipation(eventId);
   }
 
@@ -58,5 +64,47 @@ class MockEventsRepository implements EventsRepository {
   ) async {
     return _mockServer.updateParticipationStatus(
         eventId, participationId, status);
+  }
+
+  @override
+  Future<EventParticipation> updateMyParticipation(
+    String participationId,
+    String eventId,
+    int numberOfPersons,
+  ) async {
+    // Mock: return a dummy participation
+    return EventParticipation(
+      id: participationId,
+      eventId: eventId,
+      userId: 'mock-user',
+      userName: 'Mock User',
+      numberOfPersons: numberOfPersons,
+    );
+  }
+
+  @override
+  Future<void> cancelParticipation(String participationId, String eventId) async {
+    // Mock: do nothing
+  }
+
+  @override
+  Future<EventRating> rateEvent(String eventId, int rating, String? comment) async {
+    return EventRating(
+      id: 'mock-rating',
+      eventId: eventId,
+      userId: 'mock-user',
+      rating: rating,
+      comment: comment,
+    );
+  }
+
+  @override
+  Future<List<EventRating>> getEventRatings(String eventId) async {
+    return [];
+  }
+
+  @override
+  Future<double?> getAverageRating(String eventId) async {
+    return null;
   }
 }

@@ -48,6 +48,17 @@ public class Event {
 
     private String imageUrl;
 
+   // @Column(precision = 10, scale = 2)
+    private Double price;
+
+    @Column(columnDefinition = "TEXT")
+    private String activities; // JSON array stored as string
+
+    private String location;
+
+    @Builder.Default
+    private Boolean isClosed = false;
+
     @Transient
     private Integer currentParticipants;
 

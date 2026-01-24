@@ -388,6 +388,10 @@ class MockData {
           currentParticipants: 5,
           imageUrl:
               'https://images.unsplash.com/photo-1551632811-561732d1e306?w=800',
+          centerName: 'Mountain View Camping',
+          ownerFirstName: 'John',
+          ownerLastName: 'Smith',
+          ownerPhoneNumber: '+216 98 123 456',
           createdAt: DateTime.now().subtract(const Duration(days: 7)),
         ),
         Event(
@@ -402,6 +406,10 @@ class MockData {
           currentParticipants: 8,
           imageUrl:
               'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800',
+          centerName: 'Mountain View Camping',
+          ownerFirstName: 'John',
+          ownerLastName: 'Smith',
+          ownerPhoneNumber: '+216 98 123 456',
           createdAt: DateTime.now().subtract(const Duration(days: 10)),
         ),
         Event(
@@ -416,6 +424,10 @@ class MockData {
           currentParticipants: 6,
           imageUrl:
               'https://images.unsplash.com/photo-1537905569824-f89f14cceb68?w=800',
+          centerName: 'Lake Paradise Resort',
+          ownerFirstName: 'Sarah',
+          ownerLastName: 'Johnson',
+          ownerPhoneNumber: '+216 92 456 789',
           createdAt: DateTime.now().subtract(const Duration(days: 5)),
         ),
         Event(
@@ -430,6 +442,10 @@ class MockData {
           currentParticipants: 3,
           imageUrl:
               'https://images.unsplash.com/photo-1533873984035-25970ab07461?w=800',
+          centerName: 'Desert Stars Camp',
+          ownerFirstName: 'Michael',
+          ownerLastName: 'Anderson',
+          ownerPhoneNumber: '+216 95 789 123',
           createdAt: DateTime.now().subtract(const Duration(days: 3)),
         ),
         Event(
@@ -444,6 +460,10 @@ class MockData {
           currentParticipants: 12,
           imageUrl:
               'https://images.unsplash.com/photo-1445308394109-4ec2920981b1?w=800',
+          centerName: 'River Adventure Lodge',
+          ownerFirstName: 'David',
+          ownerLastName: 'Williams',
+          ownerPhoneNumber: '+216 97 234 567',
           createdAt: DateTime.now().subtract(const Duration(days: 14)),
         ),
         Event(
@@ -648,6 +668,8 @@ class MockData {
           eventId: 'event-1',
           userId: 'user-camper-2',
           userName: 'Emma Johnson',
+          phoneNumber: '+216 96 111 222',
+          userEmail: 'emma.johnson@email.com',
           status: ParticipationStatus.approved,
           message: 'Love hiking! Looking forward to this adventure.',
           requestedAt: DateTime.now().subtract(const Duration(days: 5)),
@@ -657,6 +679,8 @@ class MockData {
           eventId: 'event-1',
           userId: 'user-camper-3',
           userName: 'David Kim',
+          phoneNumber: '+216 93 333 444',
+          userEmail: 'david.kim@email.com',
           status: ParticipationStatus.approved,
           message: 'I\'ll bring my camera for the photography!',
           requestedAt: DateTime.now().subtract(const Duration(days: 4)),
@@ -666,6 +690,8 @@ class MockData {
           eventId: 'event-2',
           userId: 'user-camper-1',
           userName: 'Jordan Rivera',
+          phoneNumber: '+216 91 555 666',
+          userEmail: 'jordan.rivera@email.com',
           status: ParticipationStatus.pending,
           message: 'Perfect for our family! We\'re beginners.',
           requestedAt: DateTime.now().subtract(const Duration(days: 2)),
@@ -675,6 +701,8 @@ class MockData {
           eventId: 'event-3',
           userId: 'user-camper-4',
           userName: 'Lisa Martinez',
+          phoneNumber: '+216 94 777 888',
+          userEmail: 'lisa.martinez@email.com',
           status: ParticipationStatus.approved,
           requestedAt: DateTime.now().subtract(const Duration(days: 3)),
         ),
@@ -683,6 +711,8 @@ class MockData {
           eventId: 'event-6',
           userId: 'user-camper-1',
           userName: 'Jordan Rivera',
+          phoneNumber: '+216 91 555 666',
+          userEmail: 'jordan.rivera@email.com',
           status: ParticipationStatus.pending,
           message: 'Happy to help with the cleanup!',
           requestedAt: DateTime.now().subtract(const Duration(days: 1)),

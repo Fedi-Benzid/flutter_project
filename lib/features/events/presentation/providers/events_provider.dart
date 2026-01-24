@@ -60,6 +60,20 @@ final myParticipationForEventProvider =
   }
 });
 
+/// Provider for event ratings.
+final eventRatingsProvider =
+    FutureProvider.family<List<EventRating>, String>((ref, eventId) async {
+  final repository = ref.watch(eventsRepositoryProvider);
+  return repository.getEventRatings(eventId);
+});
+
+/// Provider for average event rating.
+final eventAverageRatingProvider =
+    FutureProvider.family<double?, String>((ref, eventId) async {
+  final repository = ref.watch(eventsRepositoryProvider);
+  return repository.getAverageRating(eventId);
+});
+
 /// Notifier for managing event operations.
 class EventsNotifier extends StateNotifier<AsyncValue<void>> {
   final EventsRepository _repository;
@@ -86,9 +100,27 @@ class EventsNotifier extends StateNotifier<AsyncValue<void>> {
     try {
       final updated = await _repository.updateEvent(id, event);
       state = const AsyncValue.data(null);
+      // Invalidate all related caches
       _ref.invalidate(allEventsProvider);
       _ref.invalidate(eventByIdProvider(id));
+      _ref.invalidate(eventParticipationsProvider(id));
+      // Also invalidate center-specific events in case center changed
+      _ref.invalidateSelf();
       return updated;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return null;
+    }
+  }
+
+  Future<Event?> closeEvent(String id) async {
+    state = const AsyncValue.loading();
+    try {
+      final closed = await _repository.closeEvent(id);
+      state = const AsyncValue.data(null);
+      _ref.invalidate(allEventsProvider);
+      _ref.invalidate(eventByIdProvider(id));
+      return closed;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       return null;
@@ -108,14 +140,17 @@ class EventsNotifier extends StateNotifier<AsyncValue<void>> {
     }
   }
 
-  Future<EventParticipation?> requestParticipation(String eventId) async {
+  Future<EventParticipation?> requestParticipation(String eventId, {int numberOfPersons = 1}) async {
     state = const AsyncValue.loading();
     try {
-      final participation = await _repository.requestParticipation(eventId);
+      final participation = await _repository.requestParticipation(eventId, numberOfPersons: numberOfPersons);
       state = const AsyncValue.data(null);
+      // Invalidate all related caches
       _ref.invalidate(eventParticipationsProvider(eventId));
       _ref.invalidate(eventByIdProvider(eventId));
       _ref.invalidate(myParticipationsProvider);
+      _ref.invalidate(myParticipationForEventProvider(eventId));
+      _ref.invalidate(allEventsProvider);
       return participation;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -133,12 +168,70 @@ class EventsNotifier extends StateNotifier<AsyncValue<void>> {
       await _repository.updateParticipationStatus(
           participationId, eventId, status);
       state = const AsyncValue.data(null);
+      // Invalidate all related participation caches
       _ref.invalidate(eventParticipationsProvider(eventId));
       _ref.invalidate(eventByIdProvider(eventId));
+      _ref.invalidate(myParticipationsProvider);
+      _ref.invalidate(myParticipationForEventProvider(eventId));
       return true;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       return false;
+    }
+  }
+
+  Future<EventParticipation?> updateMyParticipation(
+    String participationId,
+    String eventId,
+    int numberOfPersons,
+  ) async {
+    state = const AsyncValue.loading();
+    try {
+      final participation = await _repository.updateMyParticipation(
+          participationId, eventId, numberOfPersons);
+      state = const AsyncValue.data(null);
+      // Invalidate all related caches
+      _ref.invalidate(eventParticipationsProvider(eventId));
+      _ref.invalidate(eventByIdProvider(eventId));
+      _ref.invalidate(myParticipationsProvider);
+      _ref.invalidate(myParticipationForEventProvider(eventId));
+      _ref.invalidate(allEventsProvider);
+      return participation;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return null;
+    }
+  }
+
+  Future<bool> cancelParticipation(String participationId, String eventId) async {
+    state = const AsyncValue.loading();
+    try {
+      await _repository.cancelParticipation(participationId, eventId);
+      state = const AsyncValue.data(null);
+      // Invalidate all related caches
+      _ref.invalidate(eventParticipationsProvider(eventId));
+      _ref.invalidate(eventByIdProvider(eventId));
+      _ref.invalidate(myParticipationsProvider);
+      _ref.invalidate(myParticipationForEventProvider(eventId));
+      _ref.invalidate(allEventsProvider);
+      return true;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return false;
+    }
+  }
+
+  Future<EventRating?> rateEvent(String eventId, int rating, String? comment) async {
+    state = const AsyncValue.loading();
+    try {
+      final eventRating = await _repository.rateEvent(eventId, rating, comment);
+      state = const AsyncValue.data(null);
+      _ref.invalidate(eventRatingsProvider(eventId));
+      _ref.invalidate(eventAverageRatingProvider(eventId));
+      return eventRating;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return null;
     }
   }
 }
