@@ -44,12 +44,27 @@ public class MarketplaceService {
                                     item.getDescription().toLowerCase().contains(search.toLowerCase())))
                     .toList();
         }
+
+        // Populate owner info for each item
+        items.forEach(this::populateOwnerInfo);
         return items;
     }
 
     public MarketplaceItem getItemById(Long id) {
-        return marketplaceRepository.findById(id)
+        MarketplaceItem item = marketplaceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Marketplace item not found"));
+        populateOwnerInfo(item);
+        return item;
+    }
+
+    private void populateOwnerInfo(MarketplaceItem item) {
+        if (item.getOwnerId() != null) {
+            userRepository.findById(item.getOwnerId()).ifPresent(owner -> {
+                item.setOwnerName(owner.getFirstName() + " " + owner.getLastName());
+                item.setOwnerEmail(owner.getEmail());
+                item.setOwnerPhone(owner.getPhoneNumber());
+            });
+        }
     }
 
     public List<CartItem> getCartForUser(String email) {

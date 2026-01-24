@@ -94,6 +94,18 @@ class MarketplaceItem with _$MarketplaceItem {
     /// Whether the item is currently available
     @Default(true) bool isAvailable,
 
+    /// Owner ID for CRUD permissions
+    String? ownerId,
+
+    /// Owner's name for display
+    String? ownerName,
+
+    /// Owner's email for contact
+    String? ownerEmail,
+
+    /// Owner's phone for contact
+    String? ownerPhone,
+
     /// When the item was added
     DateTime? createdAt,
   }) = _MarketplaceItem;

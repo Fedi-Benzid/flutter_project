@@ -17,6 +17,7 @@ import '../features/marketplace/presentation/screens/marketplace_screen.dart';
 import '../features/marketplace/presentation/screens/item_detail_screen.dart';
 import '../features/marketplace/presentation/screens/cart_screen.dart';
 import '../features/marketplace/presentation/screens/checkout_screen.dart';
+import '../features/marketplace/presentation/screens/owner_marketplace_screen.dart';
 import '../features/reservations/presentation/screens/reservation_calendar_screen.dart';
 import '../features/reservations/presentation/screens/booking_flow_screen.dart';
 import '../features/reservations/presentation/screens/my_reservations_screen.dart';
@@ -48,6 +49,7 @@ class AppRoutes {
   static const String itemDetail = '/items/:id';
   static const String cart = '/cart';
   static const String checkout = '/checkout';
+  static const String ownerMarketplace = '/owner/marketplace';
 
   // Reservation routes
   static const String reservations = '/reservations';
@@ -239,6 +241,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.checkout,
         name: 'checkout',
         builder: (context, state) => const CheckoutScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.ownerMarketplace,
+        name: 'ownerMarketplace',
+        builder: (context, state) => const OwnerMarketplaceScreen(),
       ),
       GoRoute(
         path: '/reserve/:centerId',
