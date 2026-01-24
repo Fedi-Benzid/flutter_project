@@ -19,6 +19,10 @@ _$MarketplaceItemImpl _$$MarketplaceItemImplFromJson(
       buyPrice: (json['buyPrice'] as num?)?.toDouble(),
       quantity: (json['quantity'] as num?)?.toInt() ?? 1,
       isAvailable: json['isAvailable'] as bool? ?? true,
+      ownerId: json['ownerId'] as String?,
+      ownerName: json['ownerName'] as String?,
+      ownerEmail: json['ownerEmail'] as String?,
+      ownerPhone: json['ownerPhone'] as String?,
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -37,6 +41,10 @@ Map<String, dynamic> _$$MarketplaceItemImplToJson(
       'buyPrice': instance.buyPrice,
       'quantity': instance.quantity,
       'isAvailable': instance.isAvailable,
+      'ownerId': instance.ownerId,
+      'ownerName': instance.ownerName,
+      'ownerEmail': instance.ownerEmail,
+      'ownerPhone': instance.ownerPhone,
       'createdAt': instance.createdAt?.toIso8601String(),
     };
 

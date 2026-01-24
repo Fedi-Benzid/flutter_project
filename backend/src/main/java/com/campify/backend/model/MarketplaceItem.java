@@ -49,6 +49,16 @@ public class MarketplaceItem {
     @Min(0)
     private Integer stock;
 
+    // Transient owner info (populated at fetch time)
+    @Transient
+    private String ownerName;
+
+    @Transient
+    private String ownerEmail;
+
+    @Transient
+    private String ownerPhone;
+
     public enum ItemCategory {
         CAMPING_GEAR,
         FOOD_BEVERAGES,

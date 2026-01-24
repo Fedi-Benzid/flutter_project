@@ -50,6 +50,18 @@ mixin _$MarketplaceItem {
   /// Whether the item is currently available
   bool get isAvailable => throw _privateConstructorUsedError;
 
+  /// Owner ID for CRUD permissions
+  String? get ownerId => throw _privateConstructorUsedError;
+
+  /// Owner's name for display
+  String? get ownerName => throw _privateConstructorUsedError;
+
+  /// Owner's email for contact
+  String? get ownerEmail => throw _privateConstructorUsedError;
+
+  /// Owner's phone for contact
+  String? get ownerPhone => throw _privateConstructorUsedError;
+
   /// When the item was added
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
@@ -76,6 +88,10 @@ abstract class $MarketplaceItemCopyWith<$Res> {
       double? buyPrice,
       int quantity,
       bool isAvailable,
+      String? ownerId,
+      String? ownerName,
+      String? ownerEmail,
+      String? ownerPhone,
       DateTime? createdAt});
 }
 
@@ -102,6 +118,10 @@ class _$MarketplaceItemCopyWithImpl<$Res, $Val extends MarketplaceItem>
     Object? buyPrice = freezed,
     Object? quantity = null,
     Object? isAvailable = null,
+    Object? ownerId = freezed,
+    Object? ownerName = freezed,
+    Object? ownerEmail = freezed,
+    Object? ownerPhone = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(_value.copyWith(
@@ -145,6 +165,22 @@ class _$MarketplaceItemCopyWithImpl<$Res, $Val extends MarketplaceItem>
           ? _value.isAvailable
           : isAvailable // ignore: cast_nullable_to_non_nullable
               as bool,
+      ownerId: freezed == ownerId
+          ? _value.ownerId
+          : ownerId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ownerName: freezed == ownerName
+          ? _value.ownerName
+          : ownerName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ownerEmail: freezed == ownerEmail
+          ? _value.ownerEmail
+          : ownerEmail // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ownerPhone: freezed == ownerPhone
+          ? _value.ownerPhone
+          : ownerPhone // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -172,6 +208,10 @@ abstract class _$$MarketplaceItemImplCopyWith<$Res>
       double? buyPrice,
       int quantity,
       bool isAvailable,
+      String? ownerId,
+      String? ownerName,
+      String? ownerEmail,
+      String? ownerPhone,
       DateTime? createdAt});
 }
 
@@ -196,6 +236,10 @@ class __$$MarketplaceItemImplCopyWithImpl<$Res>
     Object? buyPrice = freezed,
     Object? quantity = null,
     Object? isAvailable = null,
+    Object? ownerId = freezed,
+    Object? ownerName = freezed,
+    Object? ownerEmail = freezed,
+    Object? ownerPhone = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(_$MarketplaceItemImpl(
@@ -239,6 +283,22 @@ class __$$MarketplaceItemImplCopyWithImpl<$Res>
           ? _value.isAvailable
           : isAvailable // ignore: cast_nullable_to_non_nullable
               as bool,
+      ownerId: freezed == ownerId
+          ? _value.ownerId
+          : ownerId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ownerName: freezed == ownerName
+          ? _value.ownerName
+          : ownerName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ownerEmail: freezed == ownerEmail
+          ? _value.ownerEmail
+          : ownerEmail // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ownerPhone: freezed == ownerPhone
+          ? _value.ownerPhone
+          : ownerPhone // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -261,6 +321,10 @@ class _$MarketplaceItemImpl implements _MarketplaceItem {
       this.buyPrice,
       this.quantity = 1,
       this.isAvailable = true,
+      this.ownerId,
+      this.ownerName,
+      this.ownerEmail,
+      this.ownerPhone,
       this.createdAt});
 
   factory _$MarketplaceItemImpl.fromJson(Map<String, dynamic> json) =>
@@ -308,13 +372,29 @@ class _$MarketplaceItemImpl implements _MarketplaceItem {
   @JsonKey()
   final bool isAvailable;
 
+  /// Owner ID for CRUD permissions
+  @override
+  final String? ownerId;
+
+  /// Owner's name for display
+  @override
+  final String? ownerName;
+
+  /// Owner's email for contact
+  @override
+  final String? ownerEmail;
+
+  /// Owner's phone for contact
+  @override
+  final String? ownerPhone;
+
   /// When the item was added
   @override
   final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'MarketplaceItem(id: $id, centerId: $centerId, name: $name, description: $description, imageUrl: $imageUrl, category: $category, rentPricePerDay: $rentPricePerDay, buyPrice: $buyPrice, quantity: $quantity, isAvailable: $isAvailable, createdAt: $createdAt)';
+    return 'MarketplaceItem(id: $id, centerId: $centerId, name: $name, description: $description, imageUrl: $imageUrl, category: $category, rentPricePerDay: $rentPricePerDay, buyPrice: $buyPrice, quantity: $quantity, isAvailable: $isAvailable, ownerId: $ownerId, ownerName: $ownerName, ownerEmail: $ownerEmail, ownerPhone: $ownerPhone, createdAt: $createdAt)';
   }
 
   @override
@@ -340,6 +420,13 @@ class _$MarketplaceItemImpl implements _MarketplaceItem {
                 other.quantity == quantity) &&
             (identical(other.isAvailable, isAvailable) ||
                 other.isAvailable == isAvailable) &&
+            (identical(other.ownerId, ownerId) || other.ownerId == ownerId) &&
+            (identical(other.ownerName, ownerName) ||
+                other.ownerName == ownerName) &&
+            (identical(other.ownerEmail, ownerEmail) ||
+                other.ownerEmail == ownerEmail) &&
+            (identical(other.ownerPhone, ownerPhone) ||
+                other.ownerPhone == ownerPhone) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
@@ -358,6 +445,10 @@ class _$MarketplaceItemImpl implements _MarketplaceItem {
       buyPrice,
       quantity,
       isAvailable,
+      ownerId,
+      ownerName,
+      ownerEmail,
+      ownerPhone,
       createdAt);
 
   @JsonKey(ignore: true)
@@ -387,6 +478,10 @@ abstract class _MarketplaceItem implements MarketplaceItem {
       final double? buyPrice,
       final int quantity,
       final bool isAvailable,
+      final String? ownerId,
+      final String? ownerName,
+      final String? ownerEmail,
+      final String? ownerPhone,
       final DateTime? createdAt}) = _$MarketplaceItemImpl;
 
   factory _MarketplaceItem.fromJson(Map<String, dynamic> json) =
@@ -432,6 +527,22 @@ abstract class _MarketplaceItem implements MarketplaceItem {
 
   /// Whether the item is currently available
   bool get isAvailable;
+  @override
+
+  /// Owner ID for CRUD permissions
+  String? get ownerId;
+  @override
+
+  /// Owner's name for display
+  String? get ownerName;
+  @override
+
+  /// Owner's email for contact
+  String? get ownerEmail;
+  @override
+
+  /// Owner's phone for contact
+  String? get ownerPhone;
   @override
 
   /// When the item was added

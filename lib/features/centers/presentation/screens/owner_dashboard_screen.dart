@@ -39,6 +39,13 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Owner Dashboard'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.inventory_2_outlined),
+            tooltip: 'Manage Products',
+            onPressed: () => context.push(AppRoutes.ownerMarketplace),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
