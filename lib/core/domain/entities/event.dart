@@ -78,8 +78,23 @@ class Event with _$Event {
     /// Phone number of the event creator
     String? creatorPhone,
 
+    /// Name of the center where the event takes place
+    String? centerName,
+
+    /// First name of the event owner
+    String? ownerFirstName,
+
+    /// Last name of the event owner
+    String? ownerLastName,
+
+    /// Phone number of the event owner
+    String? ownerPhoneNumber,
+
     /// When the event was created
     DateTime? createdAt,
+
+    /// Whether the event is closed for new requests
+    @Default(false) bool isClosed,
   }) = _Event;
 
   factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);
@@ -110,6 +125,9 @@ class EventParticipation with _$EventParticipation {
     /// Phone number of the requester
     String? phoneNumber,
 
+    /// Email of the requester
+    String? userEmail,
+
     /// Number of persons (including family/friends)
     @Default(1) int numberOfPersons,
 
@@ -128,4 +146,35 @@ class EventParticipation with _$EventParticipation {
 extension EventExtension on Event {
   bool get isFull => currentParticipants >= maxParticipants;
   int get spotsRemaining => maxParticipants - currentParticipants;
+  bool get canRequestParticipation => !isFull && !isClosed;
+}
+
+/// Rating for an event.
+@freezed
+class EventRating with _$EventRating {
+  const factory EventRating({
+    /// Unique identifier
+    required String id,
+
+    /// ID of the event
+    required String eventId,
+
+    /// ID of the user who rated
+    required String userId,
+
+    /// Name of the user (denormalized for display)
+    String? userName,
+
+    /// Rating value (1-5)
+    required int rating,
+
+    /// Optional comment
+    String? comment,
+
+    /// When the rating was created
+    DateTime? createdAt,
+  }) = _EventRating;
+
+  factory EventRating.fromJson(Map<String, dynamic> json) =>
+      _$EventRatingFromJson(json);
 }

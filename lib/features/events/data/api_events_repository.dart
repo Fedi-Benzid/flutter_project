@@ -36,6 +36,12 @@ class ApiEventsRepository implements EventsRepository {
   }
 
   @override
+  Future<Event> closeEvent(String id) async {
+    final data = await _apiService.closeEvent(id);
+    return _transformEvent(data);
+  }
+
+  @override
   Future<void> deleteEvent(String id) async {
     await _apiService.deleteEvent(id);
   }
@@ -51,6 +57,10 @@ class ApiEventsRepository implements EventsRepository {
           .toIso8601String(),
       'maxParticipants': event.maxParticipants,
       if (event.imageUrl != null) 'imageUrl': event.imageUrl,
+      if (event.price > 0) 'price': event.price,
+      if (event.activities.isNotEmpty) 'activities': event.activities.join(','),
+      if (event.location != null) 'location': event.location,
+      'isClosed': event.isClosed,
     };
   }
 
@@ -67,16 +77,9 @@ class ApiEventsRepository implements EventsRepository {
   }
 
   @override
-  Future<EventParticipation> requestParticipation(String eventId) async {
-    await _apiService.joinEvent(eventId);
-    // Return a placeholder since the API doesn't return the participation object
-    return EventParticipation(
-      id: '',
-      eventId: eventId,
-      userId: '',
-      userName: '',
-      status: ParticipationStatus.pending,
-    );
+  Future<EventParticipation> requestParticipation(String eventId, {int numberOfPersons = 1}) async {
+    final data = await _apiService.joinEvent(eventId, numberOfPersons: numberOfPersons);
+    return _transformParticipation(data);
   }
 
   @override
@@ -89,6 +92,39 @@ class ApiEventsRepository implements EventsRepository {
     final data = await _apiService.updateParticipationStatus(
         eventId, participationId, statusStr);
     return _transformParticipation(data);
+  }
+
+  @override
+  Future<EventParticipation> updateMyParticipation(
+    String participationId,
+    String eventId,
+    int numberOfPersons,
+  ) async {
+    final data = await _apiService.updateMyParticipation(
+        eventId, participationId, numberOfPersons);
+    return _transformParticipation(data);
+  }
+
+  @override
+  Future<void> cancelParticipation(String participationId, String eventId) async {
+    await _apiService.cancelParticipation(eventId, participationId);
+  }
+
+  @override
+  Future<EventRating> rateEvent(String eventId, int rating, String? comment) async {
+    final data = await _apiService.rateEvent(eventId, rating, comment);
+    return _transformRating(data);
+  }
+
+  @override
+  Future<List<EventRating>> getEventRatings(String eventId) async {
+    final data = await _apiService.getEventRatings(eventId);
+    return data.map((json) => _transformRating(json)).toList();
+  }
+
+  @override
+  Future<double?> getAverageRating(String eventId) async {
+    return await _apiService.getAverageRating(eventId);
   }
 
   String _statusToBackend(ParticipationStatus status) {
@@ -113,9 +149,15 @@ class ApiEventsRepository implements EventsRepository {
     // Calculate duration in hours
     final durationHours = endDate.difference(startDate).inHours;
 
-    // Parse activities list
-    final activitiesJson = json['activities'] as List<dynamic>?;
-    final activities = activitiesJson?.map((e) => e.toString()).toList() ?? [];
+    // Parse activities list - handle both array and comma-separated string
+    List<String> activities = [];
+    if (json['activities'] != null) {
+      if (json['activities'] is List) {
+        activities = (json['activities'] as List).map((e) => e.toString()).toList();
+      } else if (json['activities'] is String) {
+        activities = (json['activities'] as String).split(',').where((s) => s.isNotEmpty).toList();
+      }
+    }
 
     return Event(
       id: json['id'].toString(),
@@ -133,6 +175,11 @@ class ApiEventsRepository implements EventsRepository {
       activities: activities,
       creatorId: json['ownerId']?.toString(),
       creatorPhone: json['creatorPhone'] as String?,
+      centerName: json['centerName'] as String?,
+      ownerFirstName: json['ownerFirstName'] as String?,
+      ownerLastName: json['ownerLastName'] as String?,
+      ownerPhoneNumber: json['ownerPhoneNumber'] as String?,
+      isClosed: json['isClosed'] as bool? ?? false,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
@@ -163,8 +210,36 @@ class ApiEventsRepository implements EventsRepository {
       userId: json['userId'].toString(),
       userName: userName,
       phoneNumber: phoneNumber,
+      userEmail: userEmail,
+      numberOfPersons: json['numberOfPersons'] as int? ?? 1,
       status: _parseParticipationStatus(json['status'] as String?),
       requestedAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+    );
+  }
+
+  EventRating _transformRating(Map<String, dynamic> json) {
+    final userJson = json['user'] as Map<String, dynamic>?;
+    String? userName;
+
+    if (userJson != null) {
+      final firstName = userJson['firstName'] as String? ?? '';
+      final lastName = userJson['lastName'] as String? ?? '';
+      userName = '$firstName $lastName'.trim();
+      if (userName.isEmpty) {
+        userName = userJson['email'] as String?;
+      }
+    }
+
+    return EventRating(
+      id: json['id'].toString(),
+      eventId: json['eventId'].toString(),
+      userId: json['userId'].toString(),
+      userName: userName,
+      rating: json['rating'] as int? ?? 0,
+      comment: json['comment'] as String?,
+      createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
     );

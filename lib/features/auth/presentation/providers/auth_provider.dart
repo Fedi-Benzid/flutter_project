@@ -4,6 +4,8 @@ import '../../../../core/domain/entities/user.dart';
 import '../../data/api_auth_repository.dart';
 import '../../domain/auth_repository.dart';
 import '../../domain/auth_state.dart';
+import '../../../events/presentation/providers/events_provider.dart';
+import '../../../centers/presentation/providers/centers_provider.dart';
 
 /// Provider for the auth repository.
 /// Now uses the real API repository instead of mock
@@ -14,7 +16,7 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 /// Provider for the current authentication state.
 final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final repository = ref.watch(authRepositoryProvider);
-  return AuthNotifier(repository);
+  return AuthNotifier(repository, ref);
 });
 
 /// Provider that returns the current user if authenticated.
@@ -36,8 +38,9 @@ final isOwnerProvider = Provider<bool>((ref) {
 /// State notifier for managing authentication state.
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _repository;
+  final Ref? _ref;
 
-  AuthNotifier(this._repository) : super(const AuthState.initial()) {
+  AuthNotifier(this._repository, [this._ref]) : super(const AuthState.initial()) {
     // Check for stored session on initialization
     _checkStoredSession();
   }
@@ -110,6 +113,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = const AuthState.loading();
     await _repository.logout();
     state = const AuthState.unauthenticated();
+    
+    // Clear all data caches when logging out
+    if (_ref != null) {
+      // Clear event data
+      _ref!.invalidate(eventByIdProvider);
+      _ref!.invalidate(allEventsProvider);
+      _ref!.invalidate(eventParticipationsProvider);
+      _ref!.invalidate(myParticipationsProvider);
+      _ref!.invalidate(myParticipationForEventProvider);
+      
+      // Clear center data
+      _ref!.invalidate(ownedCentersProvider);
+      _ref!.invalidate(filteredCentersProvider);
+      _ref!.invalidate(featuredCentersProvider);
+      _ref!.invalidate(centerByIdProvider);
+      _ref!.invalidate(centerReviewsProvider);
+    }
   }
 
   /// Update the current user's profile.

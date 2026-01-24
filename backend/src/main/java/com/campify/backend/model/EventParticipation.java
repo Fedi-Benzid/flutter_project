@@ -2,6 +2,7 @@ package com.campify.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,6 +40,10 @@ public class EventParticipation {
     @NotNull
     @Builder.Default
     private ParticipationStatus status = ParticipationStatus.PENDING;
+
+    @Builder.Default
+    @Min(1)
+    private Integer numberOfPersons = 1;
 
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

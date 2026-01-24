@@ -27,9 +27,14 @@ _$EventImpl _$$EventImplFromJson(Map<String, dynamic> json) => _$EventImpl(
           const [],
       creatorId: json['creatorId'] as String?,
       creatorPhone: json['creatorPhone'] as String?,
+      centerName: json['centerName'] as String?,
+      ownerFirstName: json['ownerFirstName'] as String?,
+      ownerLastName: json['ownerLastName'] as String?,
+      ownerPhoneNumber: json['ownerPhoneNumber'] as String?,
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
+      isClosed: json['isClosed'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$$EventImplToJson(_$EventImpl instance) =>
@@ -49,7 +54,12 @@ Map<String, dynamic> _$$EventImplToJson(_$EventImpl instance) =>
       'activities': instance.activities,
       'creatorId': instance.creatorId,
       'creatorPhone': instance.creatorPhone,
+      'centerName': instance.centerName,
+      'ownerFirstName': instance.ownerFirstName,
+      'ownerLastName': instance.ownerLastName,
+      'ownerPhoneNumber': instance.ownerPhoneNumber,
       'createdAt': instance.createdAt?.toIso8601String(),
+      'isClosed': instance.isClosed,
     };
 
 _$EventParticipationImpl _$$EventParticipationImplFromJson(
@@ -64,6 +74,7 @@ _$EventParticipationImpl _$$EventParticipationImplFromJson(
               ParticipationStatus.pending,
       message: json['message'] as String?,
       phoneNumber: json['phoneNumber'] as String?,
+      userEmail: json['userEmail'] as String?,
       numberOfPersons: (json['numberOfPersons'] as num?)?.toInt() ?? 1,
       comments: json['comments'] as String?,
       requestedAt: json['requestedAt'] == null
@@ -81,6 +92,7 @@ Map<String, dynamic> _$$EventParticipationImplToJson(
       'status': _$ParticipationStatusEnumMap[instance.status]!,
       'message': instance.message,
       'phoneNumber': instance.phoneNumber,
+      'userEmail': instance.userEmail,
       'numberOfPersons': instance.numberOfPersons,
       'comments': instance.comments,
       'requestedAt': instance.requestedAt?.toIso8601String(),
@@ -91,3 +103,27 @@ const _$ParticipationStatusEnumMap = {
   ParticipationStatus.approved: 'approved',
   ParticipationStatus.declined: 'declined',
 };
+
+_$EventRatingImpl _$$EventRatingImplFromJson(Map<String, dynamic> json) =>
+    _$EventRatingImpl(
+      id: json['id'] as String,
+      eventId: json['eventId'] as String,
+      userId: json['userId'] as String,
+      userName: json['userName'] as String?,
+      rating: (json['rating'] as num).toInt(),
+      comment: json['comment'] as String?,
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+    );
+
+Map<String, dynamic> _$$EventRatingImplToJson(_$EventRatingImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'eventId': instance.eventId,
+      'userId': instance.userId,
+      'userName': instance.userName,
+      'rating': instance.rating,
+      'comment': instance.comment,
+      'createdAt': instance.createdAt?.toIso8601String(),
+    };

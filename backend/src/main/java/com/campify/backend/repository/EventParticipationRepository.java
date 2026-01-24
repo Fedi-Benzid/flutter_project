@@ -2,6 +2,8 @@ package com.campify.backend.repository;
 
 import com.campify.backend.model.EventParticipation;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,4 +19,8 @@ public interface EventParticipationRepository extends JpaRepository<EventPartici
     Optional<EventParticipation> findByEventIdAndUserId(Long eventId, Long userId);
 
     long countByEventIdAndStatus(Long eventId, EventParticipation.ParticipationStatus status);
+
+    @Query("SELECT SUM(p.numberOfPersons) FROM EventParticipation p WHERE p.eventId = :eventId AND p.status = :status")
+    Integer sumNumberOfPersonsByEventIdAndStatus(@Param("eventId") Long eventId,
+            @Param("status") EventParticipation.ParticipationStatus status);
 }

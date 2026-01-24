@@ -23,8 +23,11 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
   bool _isLoading = false;
   bool _isEdit = false;
   Event? _existingEvent;
-  DateTime _selectedDate = DateTime.now().add(const Duration(days: 7));
+  DateTime _selectedStartDate = DateTime.now().add(const Duration(days: 7));
+  DateTime _selectedEndDate = DateTime.now().add(const Duration(days: 8));
   TimeOfDay _selectedTime = const TimeOfDay(hour: 10, minute: 0);
+  List<String> _activities = [];
+  final TextEditingController _activityController = TextEditingController();
 
   @override
   void initState() {
@@ -35,6 +38,12 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
     }
   }
 
+  @override
+  void dispose() {
+    _activityController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadExistingEvent() async {
     setState(() => _isLoading = true);
     try {
@@ -43,16 +52,33 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
           .getEvent(widget.eventId!);
       setState(() {
         _existingEvent = event;
-        _selectedDate = event.date;
+        _selectedStartDate = event.date;
+        _selectedEndDate = event.endDate ?? event.date.add(Duration(hours: event.durationHours));
         _selectedTime = TimeOfDay(
           hour: event.date.hour,
           minute: event.date.minute,
         );
+        _activities = List.from(event.activities);
         _isLoading = false;
       });
     } catch (e) {
       setState(() => _isLoading = false);
     }
+  }
+
+  void _addActivity() {
+    if (_activityController.text.isNotEmpty) {
+      setState(() {
+        _activities.add(_activityController.text.trim());
+        _activityController.clear();
+      });
+    }
+  }
+
+  void _removeActivity(int index) {
+    setState(() {
+      _activities.removeAt(index);
+    });
   }
 
   @override
@@ -147,9 +173,21 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
                   FormBuilderValidators.minLength(20),
                 ]),
               ),
+              const SizedBox(height: 16),
+
+              // Location
+              FormBuilderTextField(
+                name: 'location',
+                initialValue: _existingEvent?.location,
+                decoration: const InputDecoration(
+                  labelText: 'Location',
+                  prefixIcon: Icon(Icons.location_on),
+                  helperText: 'Specific location or address',
+                ),
+              ),
               const SizedBox(height: 24),
 
-              // Date and time
+              // Date and time section
               Text(
                 'Date & Time',
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -158,6 +196,7 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
               ),
               const SizedBox(height: 12),
 
+              // Start date
               Row(
                 children: [
                   Expanded(
@@ -165,19 +204,24 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
                       onPressed: () async {
                         final date = await showDatePicker(
                           context: context,
-                          initialDate: _selectedDate,
+                          initialDate: _selectedStartDate,
                           firstDate: DateTime.now(),
                           lastDate: DateTime.now().add(
                             const Duration(days: 365),
                           ),
                         );
                         if (date != null) {
-                          setState(() => _selectedDate = date);
+                          setState(() {
+                            _selectedStartDate = date;
+                            if (_selectedEndDate.isBefore(_selectedStartDate)) {
+                              _selectedEndDate = _selectedStartDate.add(const Duration(days: 1));
+                            }
+                          });
                         }
                       },
                       icon: const Icon(Icons.calendar_today),
                       label: Text(
-                        '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                        'Start: ${_selectedStartDate.day}/${_selectedStartDate.month}/${_selectedStartDate.year}',
                       ),
                     ),
                   ),
@@ -201,22 +245,27 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
 
-              // Duration
-              FormBuilderTextField(
-                name: 'duration',
-                initialValue: _existingEvent?.durationHours.toString() ?? '2',
-                decoration: const InputDecoration(
-                  labelText: 'Duration (hours) *',
-                  prefixIcon: Icon(Icons.timer),
+              // End date
+              OutlinedButton.icon(
+                onPressed: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: _selectedEndDate,
+                    firstDate: _selectedStartDate,
+                    lastDate: DateTime.now().add(
+                      const Duration(days: 365),
+                    ),
+                  );
+                  if (date != null) {
+                    setState(() => _selectedEndDate = date);
+                  }
+                },
+                icon: const Icon(Icons.event),
+                label: Text(
+                  'End: ${_selectedEndDate.day}/${_selectedEndDate.month}/${_selectedEndDate.year}',
                 ),
-                keyboardType: TextInputType.number,
-                validator: FormBuilderValidators.compose([
-                  FormBuilderValidators.required(),
-                  FormBuilderValidators.numeric(),
-                  FormBuilderValidators.min(1),
-                ]),
               ),
               const SizedBox(height: 16),
 
@@ -236,6 +285,67 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
                   FormBuilderValidators.min(1),
                 ]),
               ),
+              const SizedBox(height: 16),
+
+              // Price
+              FormBuilderTextField(
+                name: 'price',
+                initialValue: _existingEvent != null && _existingEvent!.price > 0
+                    ? _existingEvent!.price.toString()
+                    : '',
+                decoration: const InputDecoration(
+                  labelText: 'Price per person (TND)',
+                  prefixIcon: Icon(Icons.attach_money),
+                  helperText: 'Leave empty for free events',
+                ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.numeric(),
+                ]),
+              ),
+              const SizedBox(height: 24),
+
+              // Activities section
+              Text(
+                'Activities',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _activityController,
+                      decoration: const InputDecoration(
+                        labelText: 'Add activity',
+                        hintText: 'e.g., Hiking, Swimming',
+                        prefixIcon: Icon(Icons.sports),
+                      ),
+                      onSubmitted: (_) => _addActivity(),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton.filled(
+                    onPressed: _addActivity,
+                    icon: const Icon(Icons.add),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              if (_activities.isNotEmpty)
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _activities.asMap().entries.map((entry) {
+                    return Chip(
+                      label: Text(entry.value),
+                      deleteIcon: const Icon(Icons.close, size: 18),
+                      onDeleted: () => _removeActivity(entry.key),
+                    );
+                  }).toList(),
+                ),
               const SizedBox(height: 16),
 
               // Image URL (optional)
@@ -273,12 +383,27 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
       final values = _formKey.currentState!.value;
 
       final eventDate = DateTime(
-        _selectedDate.year,
-        _selectedDate.month,
-        _selectedDate.day,
+        _selectedStartDate.year,
+        _selectedStartDate.month,
+        _selectedStartDate.day,
         _selectedTime.hour,
         _selectedTime.minute,
       );
+
+      final endDate = DateTime(
+        _selectedEndDate.year,
+        _selectedEndDate.month,
+        _selectedEndDate.day,
+        _selectedTime.hour,
+        _selectedTime.minute,
+      );
+
+      final durationHours = endDate.difference(eventDate).inHours;
+
+      final priceStr = values['price'] as String?;
+      final price = priceStr != null && priceStr.isNotEmpty
+          ? double.tryParse(priceStr) ?? 0.0
+          : 0.0;
 
       final event = Event(
         id: _existingEvent?.id ?? '',
@@ -286,11 +411,18 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
         title: values['title'] as String,
         description: values['description'] as String,
         date: eventDate,
-        durationHours: int.parse(values['duration'] as String),
+        endDate: endDate,
+        durationHours: durationHours > 0 ? durationHours : 2,
         maxParticipants: int.parse(values['maxParticipants'] as String),
         imageUrl: (values['imageUrl'] as String?)?.isEmpty ?? true
             ? null
             : values['imageUrl'] as String,
+        location: (values['location'] as String?)?.isEmpty ?? true
+            ? null
+            : values['location'] as String,
+        price: price,
+        activities: _activities,
+        isClosed: _existingEvent?.isClosed ?? false,
       );
 
       final notifier = ref.read(eventsNotifierProvider.notifier);

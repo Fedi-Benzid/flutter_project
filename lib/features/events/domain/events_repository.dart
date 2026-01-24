@@ -14,6 +14,9 @@ abstract class EventsRepository {
   /// Update an event (owner only).
   Future<Event> updateEvent(String id, Event event);
 
+  /// Close an event (owner only).
+  Future<Event> closeEvent(String id);
+
   /// Delete an event (owner only).
   Future<void> deleteEvent(String id);
 
@@ -24,7 +27,7 @@ abstract class EventsRepository {
   Future<List<EventParticipation>> getMyParticipations();
 
   /// Request to participate in an event.
-  Future<EventParticipation> requestParticipation(String eventId);
+  Future<EventParticipation> requestParticipation(String eventId, {int numberOfPersons = 1});
 
   /// Update participation status (owner only).
   Future<EventParticipation> updateParticipationStatus(
@@ -32,4 +35,23 @@ abstract class EventsRepository {
     String eventId,
     ParticipationStatus status,
   );
+
+  /// Update my participation request (camper only, when pending).
+  Future<EventParticipation> updateMyParticipation(
+    String participationId,
+    String eventId,
+    int numberOfPersons,
+  );
+
+  /// Cancel my participation request (camper only).
+  Future<void> cancelParticipation(String participationId, String eventId);
+
+  /// Rate an event (participant only, after event ends).
+  Future<EventRating> rateEvent(String eventId, int rating, String? comment);
+
+  /// Get ratings for an event.
+  Future<List<EventRating>> getEventRatings(String eventId);
+
+  /// Get average rating for an event.
+  Future<double?> getAverageRating(String eventId);
 }

@@ -43,17 +43,25 @@ class EventsApiService {
     }
   }
 
-  Future<void> joinEvent(String eventId) async {
+  Future<Map<String, dynamic>> joinEvent(String eventId, {int numberOfPersons = 1}) async {
     try {
-      await _dio.post('${AppConfig.eventsPath}/$eventId/participate');
+      final response = await _dio.post(
+        '${AppConfig.eventsPath}/$eventId/participate',
+        data: {'numberOfPersons': numberOfPersons},
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return apiResponse['data'] as Map<String, dynamic>;
+      }
+      throw ApiException(apiResponse['message'] ?? 'Failed to join event');
     } on DioException catch (e) {
       if (e.error is ApiException) rethrow;
       throw ApiException('Failed to join event: ${e.message}');
     }
   }
 
-  Future<Map<String, dynamic>> createEvent(
-      Map<String, dynamic> eventData) async {
+  Future<Map<String, dynamic>> createEvent(Map<String, dynamic> eventData) async {
     try {
       final response = await _dio.post(
         AppConfig.eventsPath,
@@ -71,8 +79,7 @@ class EventsApiService {
     }
   }
 
-  Future<Map<String, dynamic>> updateEvent(
-      String id, Map<String, dynamic> eventData) async {
+  Future<Map<String, dynamic>> updateEvent(String id, Map<String, dynamic> eventData) async {
     try {
       final response = await _dio.put(
         '${AppConfig.eventsPath}/$id',
@@ -90,6 +97,21 @@ class EventsApiService {
     }
   }
 
+  Future<Map<String, dynamic>> closeEvent(String id) async {
+    try {
+      final response = await _dio.put('${AppConfig.eventsPath}/$id/close');
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return apiResponse['data'] as Map<String, dynamic>;
+      }
+      throw ApiException(apiResponse['message'] ?? 'Failed to close event');
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to close event: ${e.message}');
+    }
+  }
+
   Future<void> deleteEvent(String id) async {
     try {
       final response = await _dio.delete('${AppConfig.eventsPath}/$id');
@@ -104,16 +126,9 @@ class EventsApiService {
     }
   }
 
-  Future<void> leaveEvent(String eventId) async {
-    // API doesn't have leave endpoint, would need to add
-    throw UnimplementedError('Leave event not yet implemented');
-  }
-
-  Future<List<Map<String, dynamic>>> getEventParticipations(
-      String eventId) async {
+  Future<List<Map<String, dynamic>>> getEventParticipations(String eventId) async {
     try {
-      final response =
-          await _dio.get('${AppConfig.eventsPath}/$eventId/participations');
+      final response = await _dio.get('${AppConfig.eventsPath}/$eventId/participations');
       final apiResponse = response.data as Map<String, dynamic>;
 
       if (apiResponse['success'] == true && apiResponse['data'] != null) {
@@ -145,10 +160,44 @@ class EventsApiService {
     }
   }
 
+  Future<Map<String, dynamic>> updateMyParticipation(
+      String eventId, String participationId, int numberOfPersons) async {
+    try {
+      final response = await _dio.put(
+        '${AppConfig.eventsPath}/$eventId/participations/$participationId/update',
+        data: {'numberOfPersons': numberOfPersons},
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return apiResponse['data'] as Map<String, dynamic>;
+      }
+      throw ApiException(apiResponse['message'] ?? 'Failed to update participation');
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to update participation: ${e.message}');
+    }
+  }
+
+  Future<void> cancelParticipation(String eventId, String participationId) async {
+    try {
+      final response = await _dio.delete(
+        '${AppConfig.eventsPath}/$eventId/participations/$participationId',
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] != true) {
+        throw ApiException(apiResponse['message'] ?? 'Failed to cancel participation');
+      }
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to cancel participation: ${e.message}');
+    }
+  }
+
   Future<List<Map<String, dynamic>>> getUserParticipations() async {
     try {
-      final response =
-          await _dio.get('${AppConfig.eventsPath}/my-participations');
+      final response = await _dio.get('${AppConfig.eventsPath}/my-participations');
       final apiResponse = response.data as Map<String, dynamic>;
 
       if (apiResponse['success'] == true && apiResponse['data'] != null) {
@@ -158,6 +207,58 @@ class EventsApiService {
     } on DioException catch (e) {
       if (e.error is ApiException) rethrow;
       throw ApiException('Failed to get participations: ${e.message}');
+    }
+  }
+
+  // Rating methods
+  Future<Map<String, dynamic>> rateEvent(String eventId, int rating, String? comment) async {
+    try {
+      final response = await _dio.post(
+        '${AppConfig.eventsPath}/$eventId/rate',
+        data: {
+          'rating': rating,
+          if (comment != null) 'comment': comment,
+        },
+      );
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return apiResponse['data'] as Map<String, dynamic>;
+      }
+      throw ApiException(apiResponse['message'] ?? 'Failed to rate event');
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to rate event: ${e.message}');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getEventRatings(String eventId) async {
+    try {
+      final response = await _dio.get('${AppConfig.eventsPath}/$eventId/ratings');
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true && apiResponse['data'] != null) {
+        return List<Map<String, dynamic>>.from(apiResponse['data']);
+      }
+      return [];
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to get ratings: ${e.message}');
+    }
+  }
+
+  Future<double?> getAverageRating(String eventId) async {
+    try {
+      final response = await _dio.get('${AppConfig.eventsPath}/$eventId/average-rating');
+      final apiResponse = response.data as Map<String, dynamic>;
+
+      if (apiResponse['success'] == true) {
+        return (apiResponse['data'] as num?)?.toDouble();
+      }
+      return null;
+    } on DioException catch (e) {
+      if (e.error is ApiException) rethrow;
+      throw ApiException('Failed to get average rating: ${e.message}');
     }
   }
 }

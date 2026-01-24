@@ -3,9 +3,9 @@ spring:
     name: campify-backend
 
   datasource:
-    url: jdbc:postgresql://ep-silent-mode-a8hbziq5-pooler.eastus2.azure.neon.tech/campify
-    username: neondb_owner
-    password: npg_rZI2zS9jtRkn   # ⚠️ replace with env variable in prod
+    url: jdbc:postgresql://localhost:5432/campify?sslmode=disable
+    username: postgres
+    password: wissem123  # ⚠️ replace with env variable in prod
     driver-class-name: org.postgresql.Driver
 
     hikari:
